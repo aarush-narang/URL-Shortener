@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="index.css">
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+
+<body>
+    <div>
+        <form id='link-form'>
+            <label for="link">Enter Link:</label><br>
+            <input type="text" id="link" name="link"><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    <script>
+        window.addEventListener("load", function () {
+            function sendData() {
+                const XHR = new XMLHttpRequest();
+                const FD = new FormData(form);
+                XHR.addEventListener("load", function (event) {
+                    alert(event.target.responseText);
+                });
+                XHR.addEventListener("error", function (event) {
+                    alert('Oops! Something went wrong.');
+                });
+                XHR.open("POST", "/url_shorten");
+                XHR.send(FD);
+            }
+            const form = document.getElementById("link-form");
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+                sendData();
+            });
+        });
+    </script>
+</body>
+
+</html>
