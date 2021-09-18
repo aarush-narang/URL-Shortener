@@ -1,2 +1,4 @@
 # pycharm
 __pycache__
+# env variables
+.env

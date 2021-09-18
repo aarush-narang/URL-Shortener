@@ -20,7 +20,7 @@
             function sendData() {
                 const XHR = new XMLHttpRequest();
                 XHR.addEventListener("load", function (event) {
-                    input.value = event.target.responseText
+                    input.value = `http://127.0.0.1:5000/${event.target.responseText}` // use .env var for domain instead
                 });
                 XHR.addEventListener("error", function (event) {
                     alert('Oops! Something went wrong.');
