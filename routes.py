@@ -2,12 +2,15 @@ from flask import Blueprint, json, render_template, redirect, request
 import pymongo
 import json
 import hashlib
+import re
+import os
 
-client = pymongo.MongoClient('mongodb+srv://Aarush:grxD7gx44ECwvpgv@url-shortener.dpgze.mongodb.net/url-shortener?retryWrites=true&w=majority')
+MONGO_DB_URI = os.getenv('MONGO_DB_URI')
+client = pymongo.MongoClient(MONGO_DB_URI)
 
 db = client.url_shortener  # url_shortener is database name
 
-def short_link(link, char_length=8):
+def short_link(link, char_length=6):
     if char_length > 128:
         raise ValueError(f'char_length {char_length} exceeds 128')
     hash_object = hashlib.sha512(link.encode())
@@ -45,7 +48,7 @@ def url_shorten():
     short_link_check = db.urls.find({'short_link': short_url})  # check if link is already in db
     for db_link in short_link_check:  # if link already in db
         if db_link['link'] == link:  # check if the db link is the same they want
-            return db_link['link']  #  if so return that short link
+            return db_link['short_link']  #  if so return that short link
         else:
             while True:  # otherwise keep generating short links with 1 more character until it gets one not in the db
                 new_link = short_link(link, link_size+1)
@@ -61,6 +64,9 @@ def url_shorten():
     for link in link_check:
         return link['short_link']
 
+    link_regex_pattern = 'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)'
+    if not re.match(link_regex_pattern, link):
+        link = 'https://' + link
 
     db.urls.insert_one(
         { 'link': link, 'short_link': short_url}
