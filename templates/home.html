@@ -19,20 +19,25 @@
         window.addEventListener("load", function () {
             function sendData() {
                 const XHR = new XMLHttpRequest();
-                const FD = new FormData(form);
                 XHR.addEventListener("load", function (event) {
-                    alert(event.target.responseText);
+                    input.value = event.target.responseText
                 });
                 XHR.addEventListener("error", function (event) {
                     alert('Oops! Something went wrong.');
                 });
                 XHR.open("POST", "/url_shorten");
-                XHR.send(FD);
+                XHR.send(JSON.stringify({ "link": input.value }));
             }
-            const form = document.getElementById("link-form");
+            const form = document.getElementById("link-form")
+            const input = document.getElementById("link")
             form.addEventListener("submit", function (event) {
                 event.preventDefault();
-                sendData();
+                const link_regex = new RegExp(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi)
+                if(!input.value.match(link_regex)){
+                    alert('Please enter a valid link!') // later change this so that it says it in the html not as an alert
+                } else {
+                    sendData();
+                }
             });
         });
     </script>

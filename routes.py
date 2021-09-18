@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, redirect, request, jsonify
+from flask import Blueprint, json, render_template, redirect, request, jsonify
 import pymongo
+import json
 
 client = pymongo.MongoClient("mongodb+srv://Aarush:grxD7gx44ECwvpgv@url-shortener.dpgze.mongodb.net/url-shortener?retryWrites=true&w=majority")
 db = client.url_shortener  # url_shortener is database name
@@ -27,7 +28,15 @@ def existing_link(short_link):
 
 @router.post('/url_shorten')
 def url_shorten():
-    data = request
-    print(data)
-    # shorten link with an algo so that every link is unique based on their hash and then add to db
-    return render_template('404.html')
+    data = request.data.decode()
+    link = json.loads(data)['link']
+
+    
+    short_url = 'test123'
+
+    # shorten link with an algo so that every link is unique based on their hash
+    
+    db.urls.insert_one(
+        { 'link': link, 'short_link': short_url}
+    )
+    return short_url
