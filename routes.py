@@ -6,7 +6,7 @@ import re
 import os
 
 MONGO_DB_URI = os.getenv('MONGO_DB_URI')
-client = pymongo.MongoClient(MONGO_DB_URI)
+client = pymongo.MongoClient(MONGO_DB_URI)  # you could also use sql db for this
 
 db = client.url_shortener  # url_shortener is database name
 
@@ -47,7 +47,7 @@ def url_shorten():
 
     short_link_check = db.urls.find({'short_link': short_url})  # check if link is already in db
     for db_link in short_link_check:  # if link already in db
-        if db_link['link'] == link:  # check if the db link is the same they want
+        if link in db_link['link'] :  # check if the db link is the same they want
             return db_link['short_link']  #  if so return that short link
         else:
             while True:  # otherwise keep generating short links with 1 more character until it gets one not in the db
