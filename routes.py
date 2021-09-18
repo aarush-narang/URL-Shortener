@@ -47,7 +47,7 @@ def url_shorten():
         if db_link['link'] == link:  # check if the db link is the same they want
             return db_link['link']  #  if so return that short link
         else:
-            while True:  # otherwise keep generating short links with 1 more character until it gets one not in the db 
+            while True:  # otherwise keep generating short links with 1 more character until it gets one not in the db
                 new_link = short_link(link, link_size+1)
                 link_check = db.urls.find({'short_link': new_link})
                 for db_link in link_check:
