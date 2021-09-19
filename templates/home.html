@@ -8,61 +8,100 @@
 </head>
 
 <body>
-    <div>
-        <form id='link-form'>
-            <label for="link">Enter Link:</label><br>
-            <input type="text" id="link" name="link"><br>
-            <input id="link-submit" type="submit" value="Submit">
+    <div id='form-holder'>
+        <form autocomplete="off" spellcheck="false" id='link-form'>
+            <label id='link-label' for="link">Enter Link:</label><br>
+            <div class="container">
+                <input type="text" id="link" name="link" placeholder="www.example.com"><br>
+                <span class='focus-border'></span>
+            </div>
+
+            <input id="link-submit" type="submit" value="Shorten">
         </form>
     </div>
-    <script>
-        const domain = 'http://127.0.0.1:5000/'
-        function copy_short_link() {
-            const copyText = document.querySelector("#link");
-            copyText.select();
-            document.execCommand("copy");
+    <script type="text/javascript" src="{{ url_for('static', filename='url_shorten.js') }}">
+
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Handlee&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Coming+Soon&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Urbanist&display=swap');
+
+        body { 
+            background-color: rgb(6, 20, 29);
         }
 
-        window.addEventListener("load", function () {
-            function sendData() {
-                const XHR = new XMLHttpRequest();
-                XHR.addEventListener("load", function (event) {
-                    resp = JSON.parse(event.target.responseText)
-                    if (resp.valid === 'invalidURL') {
-                        alert(resp.msg)
-                    } else {
-                        input.value = `${domain}${resp.short_link}`
-                        check_input_value(`${domain}${resp.short_link}`)
-                        link_submit_button.value = 'Copy'
-                        link_submit_button.type = 'button'
+        /* center the form */
+        #form-holder { 
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -100%);
+            text-align: center;
+        }
 
-                        document.querySelector("#link-submit").addEventListener("click", copy_short_link);
-                    }
-                });
-                XHR.addEventListener("error", function (event) {
-                    alert(`Oops! Something went wrong.`);
-                });
-                XHR.open("POST", "/url_shorten");
-                XHR.send(JSON.stringify({ "link": input.value }));
-            }
-            function check_input_value(short_link) {
-                const input_check = setInterval(() => {
-                    if (input.value != short_link) {
-                        link_submit_button.value = 'Submit'
-                        link_submit_button.type = 'submit'
-                        clearInterval(input_check)
-                    }
-                }, 100);
-            }
-            const form = document.getElementById("link-form")
-            const input = document.getElementById("link")
-            const link_submit_button = document.getElementById('link-submit')
-            form.addEventListener("submit", function (event) {
-                event.preventDefault();
-                sendData();
-            });
-        });
-    </script>
+        /* label font properties */
+        #link-label { 
+            font-family: Handlee;
+            color: white;
+            font-size: 200%;
+        }
+
+        /* input box design and font */
+        #link { 
+            display: block;
+            color: white;
+            font-size: 17px;
+            font-family: Coming Soon;
+            background-color: rgb(10, 27, 37);
+            border: none;
+            outline: none;
+            caret-color: white;
+            padding: 10px 0px 10px 9px;
+            width: 300px;
+            margin-bottom: -10px;
+            border-radius: 7px 7px 3px 3px;
+        }
+
+        .container { 
+            width: 100%;
+            position: relative;
+        }
+        
+        /* input border animation */
+        #link~.focus-border { 
+            position: absolute;
+            bottom: 8px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #4e9ce9;
+            transition: 0.4s;
+        }
+
+        #link:focus~.focus-border {
+            width: 100%;
+            transition: 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+        /* button design */
+        #link-submit {
+            font-family: Urbanist;
+            outline: none;
+            border: none;
+            width: 309px;
+            height: 35px;
+            border-radius: 3px 3px 7px 7px;
+            background-color: rgb(0, 51, 80);
+            color: rgb(189, 203, 214);
+            transition: 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+        #link-submit:hover {
+            background-color: rgb(0, 40, 63);
+        }
+        
+    </style>
 </body>
 
 </html>
