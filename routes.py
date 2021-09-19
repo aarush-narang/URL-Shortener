@@ -52,7 +52,7 @@ def url_shorten():
     if not re.match(full_link_regex, link):
         if '.' not in link:
             return jsonify(valid='invalidURL', msg='Please enter a valid URL!')
-        if not re.search('(http|https)', link): # this can still be evaded, fix this
+        if not re.search('(http|https)', link):
             link = 'https://' + link
         else:
             return jsonify(valid='invalidURL', msg='Please enter a valid URL!')
