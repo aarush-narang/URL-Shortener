@@ -37,8 +37,16 @@ window.addEventListener("load", function () {
         XHR.addEventListener("error", function (event) {
             alert(`Oops! Something went wrong.`);
         });
-        XHR.open("POST", "/url_shorten");
-        XHR.send(JSON.stringify({ "link": input.value }));
+
+        const IP_XHR = new XMLHttpRequest();
+        IP_XHR.addEventListener('load', function (event) {
+            IP = JSON.parse(event.target.responseText).ip
+
+            XHR.open("POST", "/url_shorten");
+            XHR.send(JSON.stringify({ "link": input.value, 'ip': IP }));
+        })
+        IP_XHR.open('GET', 'https://api.ipify.org?format=json');
+        IP_XHR.send();
     }
     function check_input_value(short_link) {
         const input_check = setInterval(() => {

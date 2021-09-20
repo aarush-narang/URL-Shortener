@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Handlee&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Coming+Soon&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Urbanist&display=swap');
+
+body {
+    background-color: rgb(6, 20, 29);
+}
+
+/* center the form */
+#form-holder {
+    display: inline-block;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -90%);
+    text-align: center;
+}
+
+/* label font properties */
+#link-label {
+    font-family: Handlee;
+    color: white;
+    font-size: 200%;
+    padding-bottom: 10px;
+}
+
+/* input box design and font */
+#link {
+    color: white;
+    font-size: 17px;
+    font-family: Coming Soon;
+    background-color: rgb(10, 27, 37);
+    border: none;
+    outline: none;
+    caret-color: white;
+    padding: 10px 0px 10px 9px;
+    width: 300px;
+    margin-bottom: 7px;
+    border-radius: 7px 7px 3px 3px;
+}
+
+.container {
+    width: 100%;
+    position: relative;
+}
+
+/* input border animation */
+#link~.focus-border {
+    position: absolute;
+    bottom: 8px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #4e9ce9;
+    transition: 0.4s;
+}
+
+#link:focus~.focus-border {
+    width: 100%;
+    transition: 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+/* button design */
+#link-submit {
+    font-family: Urbanist;
+    outline: none;
+    border: none;
+    width: 309px;
+    height: 35px;
+    border-radius: 3px 3px 7px 7px;
+    background-color: rgb(0, 51, 80);
+    color: rgb(189, 203, 214);
+    transition: 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+    margin-top: -6px;
+}
+
+#link-submit:hover {
+    background-color: rgb(4, 78, 121);
+}
+
+#link-submit:active {
+    background-color: rgb(11, 69, 102);
+}
+
+/* warning message */
+#warning-message {
+    font-family: Urbanist;
+    color: red;
+    font-size: 10pt;
+    margin-top: -7px;
+}
+
+#warning-message-container {
+    max-width: 308px;
+}
