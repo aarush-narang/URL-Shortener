@@ -4,11 +4,12 @@ import json
 import hashlib
 import re
 import threading, time, datetime
+import certifi
 
 
 MONGO_DB_URI = os.getenv('MONGO_DB_URI')
 PROJ_PATH = os.getenv('PROJ_PATH')
-client = pymongo.MongoClient(MONGO_DB_URI)  # you could also use sql db for this
+client = pymongo.MongoClient(MONGO_DB_URI, tlsCAFile=certifi.where())  # you could also use sql db for this
 db = client.url_shortener  # url_shortener is database name
 requests = {}  # record all ip addresses and # of requests from each
 
@@ -92,6 +93,9 @@ def url_shorten():
 
     if not re.match(link_regex_1, link) and not re.match(link_regex_2, link) and not re.match(link_regex_3, link) and not re.match(link_regex_4, link):
         return jsonify(valid='invalidURL', msg='Please enter a valid URL!')
+    
+    if re.match(link_regex_1, link) or re.match(link_regex_2, link):
+        link = 'https://' + link
     
     # ratelimiting
     # starting intervals that clear the number of requests per min/hr
