@@ -10,23 +10,85 @@
 
 <body>
     <div>
-        <h1>
-            404 PAGE NOT FOUND
-        </h1>
-        <div>
-            <button onclick=home_redirect()>Click Here to return home</button>
+        <div id='container'>
+            <img id='image-404' src="../images/404-page.png">
+            <div id='msg-container'>
+                <h1 id='msg-404'>
+                    404 PAGE NOT FOUND
+                </h1>
+                <p id='text-404'>Uh oh, the link you entered was not found. This means you clicked on a bad link or entered an invalid url</p>
+            </div>
+            <div>
+                <button id='back-to-home-btn' onclick=home_redirect()>Click Here to return home</button>
+            </div>
         </div>
+
     </div>
     <script>
         const home_redirect = () => window.location = '/home'
-        // make this look better and say you clicked on a bad link or entered an invalid url or something
     </script>
     <style>
-        h1 {
-            color: rgb(0, 0, 0);
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Handlee&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Coming+Soon&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Urbanist&display=swap');
+
         body {
-            background-color: rgb(57, 179, 216);
+            background-color: rgb(6, 20, 29);
+        }
+
+        #container {
+            text-align: center;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -65%);
+            text-align: center;
+        }
+
+        #msg-container {
+            padding-top: 20px;
+        }
+
+        #msg-404 {
+            color: rgb(128, 188, 211);
+            font-family: Handlee;
+            margin-top: -30px;
+            margin-bottom: -5px;
+            
+        }
+
+        #text-404 {
+            color: rgb(91, 170, 201);
+            font-family: Coming Soon;
+            padding-bottom: 5px;
+        }
+
+        #image-404 {
+            margin-bottom: -10px;
+            max-width: 600px;
+        }
+
+        #back-to-home-btn {
+            font-family: Urbanist;
+            outline: none;
+            border: none;
+
+            width: 70%;
+            max-width: 300px;
+            min-width: 200px;
+            height: 35px;
+
+            border-radius: 7px;
+            
+            background-color: rgb(0, 51, 80);
+            color: rgb(189, 203, 214);
+            transition: 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+        #back-to-home-btn:hover {
+            background-color: rgb(4, 78, 121);
+        }
+        #back-to-home-btn:active {
+            background-color: rgb(11, 69, 102);
         }
     </style>
 </body>

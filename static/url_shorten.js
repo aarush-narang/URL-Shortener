@@ -11,7 +11,20 @@ window.addEventListener("load", function () {
         XHR.addEventListener("load", function (event) {
             resp = JSON.parse(event.target.responseText)
             if (resp.valid === 'invalidURL') {
-                alert(resp.msg)
+                link_input = document.getElementById('link')
+                old_value = link_input.value
+                link_input.style.border = 'thin solid red'
+
+                warning_message = document.getElementById('warning-message')
+                warning_message.innerHTML = resp.msg
+
+                const warning_interval = setInterval(() => {
+                    if(link_input.value != old_value) {
+                        link_input.style.border = 'none'
+                        warning_message.innerHTML = ''
+                        clearInterval(warning_interval)
+                    }
+                }, 100);
             } else {
                 input.value = `${domain}${resp.short_link}`
                 check_input_value(`${domain}${resp.short_link}`)

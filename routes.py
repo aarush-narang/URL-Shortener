@@ -1,9 +1,11 @@
-from flask import Blueprint, json, render_template, redirect, request, jsonify
+from flask import Blueprint, json, render_template, redirect, request, jsonify, send_file
 import pymongo
 import json
 import hashlib
 import re
 import os
+
+from werkzeug.exceptions import abort
 
 MONGO_DB_URI = os.getenv('MONGO_DB_URI')
 client = pymongo.MongoClient(MONGO_DB_URI)  # you could also use sql db for this
@@ -53,6 +55,8 @@ def url_shorten():
         if '.' not in link:
             return jsonify(valid='invalidURL', msg='Please enter a valid URL!')
         if not re.search('(http|https)', link):
+            # if re.match('^.+(www.)?[a-zA-Z0-9@:%._\+~#?&\/=]{2,256}.+$', link):  # FIX THIS REGEX, make sure people cant put ://test.com, ;//test.com or anything like that in the input
+            #     return jsonify(valid='invalidURL', msg='Please enter a valid URL!')
             link = 'https://' + link
         else:
             return jsonify(valid='invalidURL', msg='Please enter a valid URL!')
@@ -83,3 +87,13 @@ def url_shorten():
         { 'link': link, 'short_link': short_url }
     )
     return jsonify(short_link=short_url)
+
+@router.get('/images/<img_name>')
+def return_image(img_name):
+    img_dir_path = os.path.dirname('C:\\Users\\Aarus\\PycharmProjects\\url-shortener-with-flask\\images')
+
+    for root, dirs, files in os.walk(img_dir_path):
+        for file in files: 
+            if file.endswith('.png') and img_name in file:
+                return send_file(f'C:\\Users\\Aarus\\PycharmProjects\\url-shortener-with-flask\\images\\{file}')
+    return abort(404)
