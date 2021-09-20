@@ -112,7 +112,7 @@ def url_shorten():
     link_regex_4 = '((http|https):\/\/)(www\.)[a-zA-Z0-9_]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # https://www.google.com
 
     if not re.match(link_regex_1, link) and not re.match(link_regex_2, link) and not re.match(link_regex_3, link) and not re.match(link_regex_4, link):
-        return jsonify(valid='invalidURL', msg='Youv\'e been ratelimited because you sent too many requests. Try again in a little bit.')
+        return jsonify(valid='invalidURL', msg='Please enter a valid URL!')
     
 
     short_url = short_link(link, link_size)  # shorten the link
