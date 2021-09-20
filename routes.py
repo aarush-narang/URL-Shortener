@@ -1,18 +1,18 @@
-from flask import Blueprint, json, render_template, redirect, request, jsonify, send_file, abort
-import pymongo
+from flask import Blueprint, render_template, redirect, request, jsonify, send_file, abort
+import pymongo, os
 import json
 import hashlib
 import re
-import os
-import threading, time
+import threading, time, datetime
+
 
 MONGO_DB_URI = os.getenv('MONGO_DB_URI')
 PROJ_PATH = os.getenv('PROJ_PATH')
 client = pymongo.MongoClient(MONGO_DB_URI)  # you could also use sql db for this
 db = client.url_shortener  # url_shortener is database name
+requests = {}  # record all ip addresses and # of requests from each
 
-
-class setInterval:
+class setInterval:  # this is like the setInterval function in javascript
     def __init__(self,interval,action) :
         self.interval=interval
         self.action=action
@@ -29,13 +29,23 @@ class setInterval:
     def cancel(self) :
         self.stopEvent.set()
 
-def startInterval(t, func):
+def startInterval(t, func):  # start the interval and specify the time between each interval and what function to execute
     interval = setInterval(t, func)
     return interval
 
-def endInterval(t, interval):
+def endInterval(t, interval):  # end the interval after a specified amount of time and specify which interval to end
     timer = threading.Timer(t, interval.cancel)
     timer.start()
+
+def setTimeout(t, func, args=None):  # this is like the setTimeout function in javascript
+    timer = threading.Timer(t, func, args)
+    timer.start()
+
+def time_to_endofday(dt=None):  # number of seconds until the day ends
+    if dt is None:
+        dt = datetime.datetime.now()
+    tomorrow = dt + datetime.timedelta(days=1)
+    return (datetime.datetime.combine(tomorrow, datetime.time.min) - dt).total_seconds()
 
 
 def short_link(link, char_length=7):  # make random instead of hash
@@ -71,38 +81,6 @@ def url_shorten():
     data = request.data.decode()  # request data, the link they want to shorten
     link = json.loads(data)['link']  # convert from json to dict
 
-    # ratelimiting
-    # requests = {}  # record all ip addresses and # of requests from each
-    # def clearMinuteNumbers():
-    #     for addr in requests:
-    #         requests[addr]['last_minute'] = 0
-
-    # def clearDayNumbers():
-    #     for addr in requests:
-    #         requests[addr]['last_day'] = 0
-    # startInterval(60, clearMinuteNumbers)
-    # startInterval(86400, clearDayNumbers)
-
-    # ip_addr = json.loads(data)['ip']  # ip addr from request
-
-    # if ip_addr not in requests:
-    #     requests[ip_addr] = { 'last_minute': 1, 'last_day': 1, 'ratelimited': False }
-    # else:
-    #     requests[ip_addr]['last_minute'] += 1
-    #     requests[ip_addr]['last_day'] += 1
-    #     if requests[ip_addr]['last_minute'] >= 6000:
-    #         requests[ip_addr]['ratelimited'] = True
-    #         return jsonify(valid='invalidURL', msg='Youv\'e been ratelimited because you sent too many requests.')
-
-
-    # 'IP_ADDR': {
-    #   'last_minute': 'num_of_requests_in_the_last_minute',
-    #   'last_day': 'num_of_requests_in_the_day',
-    #   'ratelimited': 'true/false if they are ratelimited or not'
-    # }
-    
-
-
     # check if link is valid
     if re.search('((http:\/\/)?127\.0\.0\.1:5000\/).+', link):
         return jsonify(valid='invalidURL', msg='That is already a shortened link!')
@@ -115,8 +93,45 @@ def url_shorten():
     if not re.match(link_regex_1, link) and not re.match(link_regex_2, link) and not re.match(link_regex_3, link) and not re.match(link_regex_4, link):
         return jsonify(valid='invalidURL', msg='Please enter a valid URL!')
     
+    # ratelimiting
+    # starting intervals that clear the number of requests per min/hr
+    def clearMinuteNumbers():
+        for addr in requests:
+            requests[addr]['last_minute'] = 0
 
-    short_url = short_link(link, link_size)  # shorten the link
+    def clearDayNumbers():
+        for addr in requests:
+            requests[addr]['last_day'] = 0
+
+    def clearRateLimit():
+        requests[ip_addr]['ratelimited'] = False
+
+    startInterval(60, clearMinuteNumbers)
+    startInterval(86400, clearDayNumbers)
+
+    ip_addr = json.loads(data)['ip']  # ip addr from request
+
+    if ip_addr not in requests:  # if the ip is new, add it
+        requests[ip_addr] = { 'last_minute': 1, 'last_day': 1, 'ratelimited': False }
+    elif requests[ip_addr]['ratelimited']:  # if ip is ratelimited, restrict them from making more requests
+        return jsonify(valid='invalidURL', msg='Youv\'e been ratelimited because you sent too many requests, try again later.')
+    else:  # otherwise, increment their request count and then check if they exceed their limit of requests
+        requests[ip_addr]['last_minute'] += 1
+        requests[ip_addr]['last_day'] += 1
+        if requests[ip_addr]['last_minute'] >= 5000:  # if the ip exceeds the max number of requests, restrict them from making more requests
+            requests[ip_addr]['ratelimited'] = True
+            requests[ip_addr]['last_minute'] = 0
+            setTimeout(5, clearRateLimit)
+            return jsonify(valid='invalidURL', msg='Youv\'e been ratelimited because you sent too many requests, try again later.')
+        if requests[ip_addr]['last_day'] >= 20000:  # if the ip exceeds the max number of requests, restrict them from making more requests
+            requests[ip_addr]['ratelimited'] = True
+            requests[ip_addr]['last_day'] = 0
+            setTimeout(time_to_endofday(), clearRateLimit)
+            return jsonify(valid='invalidURL', msg='Youv\'e been ratelimited because you sent too many requests, try again later.')
+    
+
+    # shorten the link
+    short_url = short_link(link, link_size)  
 
     short_link_check = db.urls.find({'short_link': short_url})  # check if short link is already in db
     for db_link in short_link_check:  # if link already in db
@@ -137,9 +152,9 @@ def url_shorten():
     for link in link_check:
         return jsonify(short_link=link['short_link'])
 
-    # db.urls.insert_one(
-    #     { 'link': link, 'short_link': short_url }
-    # )
+    db.urls.insert_one(
+        { 'link': link, 'short_link': short_url }
+    )
     return jsonify(short_link=short_url)
 
 

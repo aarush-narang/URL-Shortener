@@ -35,7 +35,20 @@ window.addEventListener("load", function () {
             }
         });
         XHR.addEventListener("error", function (event) {
-            alert(`Oops! Something went wrong.`);
+            link_input = document.getElementById('link')
+            old_value = link_input.value
+            link_input.style.border = 'thin solid red'
+
+            warning_message = document.getElementById('warning-message')
+            warning_message.innerHTML = 'Oops! Something went wrong, please try again.'
+
+            const warning_interval = setInterval(() => {
+                if(link_input.value != old_value) {
+                    link_input.style.border = 'none'
+                    warning_message.innerHTML = ''
+                    clearInterval(warning_interval)
+                }
+            }, 100);
         });
 
         const IP_XHR = new XMLHttpRequest();
