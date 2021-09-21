@@ -5,6 +5,7 @@ import hashlib
 import re
 import threading, time, datetime
 import certifi
+import random
 
 
 MONGO_DB_URI = os.getenv('MONGO_DB_URI')
@@ -49,12 +50,28 @@ def time_to_endofday(dt=None):  # number of seconds until the day ends
     return (datetime.datetime.combine(tomorrow, datetime.time.min) - dt).total_seconds()
 
 
-def short_link(link, char_length=7):  # make random instead of hash
+def short_link(link, char_length=7):
+    # short link length
+    char_length = 7
     if char_length > 128:
         raise ValueError(f'char_length {char_length} exceeds 128')
+
+    # shuffle all chars that can be used
+    chars = 'abcdefghijklmnopqrstuvqxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+    chars = list(chars)
+    random.shuffle(chars)
+    chars = ''.join(chars)
+
+    # generate the link
     hash_object = hashlib.sha512(link.encode())
     hash_hex = hash_object.hexdigest()
-    return hash_hex[0:char_length]
+    new_link = hash_hex[0:char_length] + chars
+
+    # take random section of the long string of chars
+    lower_bound_max = len(new_link) - char_length - 1
+    bound = random.randint(0, lower_bound_max)
+    
+    return new_link[bound:bound+char_length]
 
 
 router = Blueprint(__name__, 'routes')
@@ -82,21 +99,6 @@ def url_shorten():
     data = request.data.decode()  # request data, the link they want to shorten
     link = json.loads(data)['link']  # convert from json to dict
 
-    # check if link is valid
-    if re.search('((http:\/\/)?127\.0\.0\.1:5000\/).+', link):
-        return jsonify(valid='invalidURL', msg='That is already a shortened link!')
-
-    link_regex_1 = '(?!www\.)[a-zA-Z0-9_]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # google.com
-    link_regex_2 = '(www\.)[a-zA-Z0-9_]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # www.google.com
-    link_regex_3 = '((http|https):\/\/)(?!www\.)[a-zA-Z0-9_]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # https://google.com
-    link_regex_4 = '((http|https):\/\/)(www\.)[a-zA-Z0-9_]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # https://www.google.com
-
-    if not re.match(link_regex_1, link) and not re.match(link_regex_2, link) and not re.match(link_regex_3, link) and not re.match(link_regex_4, link):
-        return jsonify(valid='invalidURL', msg='Please enter a valid URL!')
-    
-    if re.match(link_regex_1, link) or re.match(link_regex_2, link):
-        link = 'https://' + link
-    
     # ratelimiting
     # starting intervals that clear the number of requests per min/hr
     def clearMinuteNumbers():
@@ -122,16 +124,31 @@ def url_shorten():
     else:  # otherwise, increment their request count and then check if they exceed their limit of requests
         requests[ip_addr]['last_minute'] += 1
         requests[ip_addr]['last_day'] += 1
-        if requests[ip_addr]['last_minute'] >= 5000:  # if the ip exceeds the max number of requests, restrict them from making more requests
+        if requests[ip_addr]['last_minute'] >= 1000:  # if the ip exceeds the max number of requests, restrict them from making more requests
             requests[ip_addr]['ratelimited'] = True
             requests[ip_addr]['last_minute'] = 0
-            setTimeout(5, clearRateLimit)
+            setTimeout(600, clearRateLimit)
             return jsonify(valid='invalidURL', msg='Youv\'e been ratelimited because you sent too many requests, try again later.')
-        if requests[ip_addr]['last_day'] >= 20000:  # if the ip exceeds the max number of requests, restrict them from making more requests
+        if requests[ip_addr]['last_day'] >= 10000:  # if the ip exceeds the max number of requests, restrict them from making more requests
             requests[ip_addr]['ratelimited'] = True
             requests[ip_addr]['last_day'] = 0
             setTimeout(time_to_endofday(), clearRateLimit)
             return jsonify(valid='invalidURL', msg='Youv\'e been ratelimited because you sent too many requests, try again later.')
+
+    # check if link is valid
+    if re.search('((http:\/\/)?127\.0\.0\.1:5000\/).+', link):
+        return jsonify(valid='invalidURL', msg='That is already a shortened link!')
+
+    link_regex_1 = '(?!www\.)[a-zA-Z0-9_]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # google.com
+    link_regex_2 = '(www\.)[a-zA-Z0-9_]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # www.google.com
+    link_regex_3 = '((http|https):\/\/)(?!www\.)[a-zA-Z0-9_]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # https://google.com
+    link_regex_4 = '((http|https):\/\/)(www\.)[a-zA-Z0-9_]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # https://www.google.com
+
+    if not re.match(link_regex_1, link) and not re.match(link_regex_2, link) and not re.match(link_regex_3, link) and not re.match(link_regex_4, link):
+        return jsonify(valid='invalidURL', msg='Please enter a valid URL!')
+    
+    if re.match(link_regex_1, link) or re.match(link_regex_2, link):
+        link = 'https://' + link
     
 
     # shorten the link
@@ -145,12 +162,13 @@ def url_shorten():
             while True:  # otherwise keep generating short links with 1 more character until it gets one not in the db
                 new_link = short_link(link, link_size+1)
                 link_check = db.urls.find({'short_link': new_link})
+                old_db_link = ''
                 for db_link in link_check:
-                    if db_link['link'] != link:
-                        link_size += 1
-                        continue
-                return jsonify(short_link=new_link)
-
+                    old_db_link = db_link
+                if old_db_link == new_link:
+                    continue
+                short_url = new_link
+                break
 
     link_check = db.urls.find({'link': link}) # check if link is already in db
     for link in link_check:

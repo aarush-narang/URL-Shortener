@@ -1,6 +1,5 @@
 from flask import Flask, redirect, render_template
 from routes import router
-import threading, time
 
 app = Flask(__name__)
 app.register_blueprint(router, url_prefix='/')
