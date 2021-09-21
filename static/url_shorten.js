@@ -84,12 +84,10 @@ window.addEventListener("load", function () {
         const link_regex_2 = /(www\.)[a-zA-Z0-9._]{2,256}\.[a-z0-9:]{2,6}([-a-zA-Z0-9._]*)/g  // www.google.com
         const link_regex_3 = /((http|https):\/\/)(?!www\.)[a-zA-Z0-9._]{2,256}\.[a-z0-9:]{2,6}([-a-zA-Z0-9._]*)/g  // https://google.com
         const link_regex_4 = /((http|https):\/\/)(www\.)[a-zA-Z0-9._]{2,256}\.[a-z0-9:]{2,6}([-a-zA-Z0-9._]*)/g  // https://www.google.com
-        if (input.value === '') {
+        if (input.value === '' || (!input.value.match(link_regex_1) && !input.value.match(link_regex_2) && !input.value.match(link_regex_3) && !input.value.match(link_regex_4))) {
             return sendData(true, 'Please enter a valid URL!');
         } else if(input.value.match(/((http:\/\/)?127\.0\.0\.1:5000\/)(.+)/g)) {
             return sendData(true, 'That is already a shortened link!')
-        } else if(!input.value.match(link_regex_1) && !input.value.match(link_regex_2) && !input.value.match(link_regex_3) && !input.value.match(link_regex_4)) {
-            return sendData(true, 'Please enter a valid URL!')
         }
         sendData();
     });
