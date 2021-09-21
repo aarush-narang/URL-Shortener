@@ -9,10 +9,5 @@ app.register_blueprint(router, url_prefix='/')
 def pagenotfound(e):
     return render_template('404.html')
 
-StartTime=time.time()
-def action() :
-    print('action ! -> time : {:.1f}s'.format(time.time()-StartTime))
-    
-
 if __name__ == '__main__':
     app.run(debug=True)
