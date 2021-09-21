@@ -135,17 +135,8 @@ def url_shorten():
             setTimeout(time_to_endofday(), clearRateLimit)
             return jsonify(valid='invalidURL', msg='Youv\'e been ratelimited because you sent too many requests, try again later.')
 
-    # check if link is valid
-    if re.search('((http:\/\/)?127\.0\.0\.1:5000\/).+', link):
-        return jsonify(valid='invalidURL', msg='That is already a shortened link!')
-
-    link_regex_1 = '(?!www\.)[a-zA-Z0-9_]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # google.com
-    link_regex_2 = '(www\.)[a-zA-Z0-9_]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # www.google.com
-    link_regex_3 = '((http|https):\/\/)(?!www\.)[a-zA-Z0-9_]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # https://google.com
-    link_regex_4 = '((http|https):\/\/)(www\.)[a-zA-Z0-9_]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # https://www.google.com
-
-    if not re.match(link_regex_1, link) and not re.match(link_regex_2, link) and not re.match(link_regex_3, link) and not re.match(link_regex_4, link):
-        return jsonify(valid='invalidURL', msg='Please enter a valid URL!')
+    link_regex_1 = '(?!www\.)[a-zA-Z0-9._]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # google.com
+    link_regex_2 = '(www\.)[a-zA-Z0-9._]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # www.google.com
     
     if re.match(link_regex_1, link) or re.match(link_regex_2, link):
         link = 'https://' + link
