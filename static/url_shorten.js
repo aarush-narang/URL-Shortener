@@ -50,14 +50,14 @@ window.addEventListener("load", function () {
             }
             input.value = `${domain}${resp.short_link}` // otherwise edit the input value to show the new shortened link
             check_input_value(`${domain}${resp.short_link}`) // create an interval to check if the input is changed
-            link_submit_button.value = 'Copy' // change shorten button to copy button
+            link_submit_button.value = 'Copy Link' // change shorten button to copy button
             link_submit_button.type = 'button'
             link_submit_button.style.width = '300px'
 
             // create new btn that will open the link when clicked
             new_btn = document.createElement('input')
             const btns = document.getElementById('btns')
-            new_btn.value = 'Open'
+            new_btn.value = 'Open Link'
             new_btn.type = 'button'
             new_btn.id = 'link-copy'
             new_btn.style.width = '300px'

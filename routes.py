@@ -142,6 +142,19 @@ def url_shorten():
         link = 'https://' + link
     
 
+    # check if domain/link is banned
+    with open('banned.json', 'r') as f:
+        banned = json.load(f)
+    
+    for domain in banned['domains']:
+        if domain in link:
+            return jsonify(ratelimited=True, msg='That domain is banned.')
+
+    for specific_link in banned['links']:
+        if specific_link == link:
+            return jsonify(ratelimited=True, msg='That link is banned.')
+
+
     # check if link is already in db
     link_check = db.urls.find({'link': link.lower() }) 
     for link in link_check:
