@@ -142,6 +142,11 @@ def url_shorten():
         link = 'https://' + link
     
 
+    # check if link is already in db
+    link_check = db.urls.find({'link': link.lower() }) 
+    for link in link_check:
+        return jsonify(short_link=link['short_link'])
+        
     # shorten the link
     short_url = short_link(link, link_size)  
 
