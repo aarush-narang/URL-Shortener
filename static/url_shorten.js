@@ -1,4 +1,6 @@
-const domain = 'http://127.0.0.1:5000/'
+const script = document.currentScript
+const domain = `http://${script.getAttribute('domain')}:${script.getAttribute('port')}/`
+
 function copy_short_link() {
     const copyText = document.querySelector("#link");
     copyText.select();

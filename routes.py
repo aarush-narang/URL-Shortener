@@ -82,7 +82,7 @@ def home_redirect():
 
 @router.route('/home')
 def home():
-    return render_template('home.html')
+    return render_template('home.html', domain=os.getenv('DOMAIN'), port=os.getenv('PORT'))
 
 
 @router.route('/<short_link>')

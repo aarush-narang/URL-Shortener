@@ -8,12 +8,11 @@ body {
 
 /* center the form */
 #form-holder {
-    display: inline-block;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -90%);
+    display: flex;
+    justify-content: center;
     text-align: center;
+    min-height: 80vh;
+    align-items: center;
 }
 
 /* label font properties */
@@ -26,17 +25,19 @@ body {
 
 /* input box design and font */
 #link {
-    color: white;
+    color: rgb(157, 220, 236);
     font-size: 17px;
     font-family: Coming Soon;
     background-color: rgb(10, 27, 37);
     border: none;
     outline: none;
     caret-color: white;
-    padding: 10px 0px 10px 9px;
-    width: 300px;
+    padding: 10px 0px 10px 20px;
+    width: 589px;
+    height: 50px;
     margin-bottom: 7px;
     border-radius: 7px 7px 3px 3px;
+    box-shadow: 0px 2px 1px rgba(78, 156, 233, 0.4);
 }
 
 .container {
@@ -47,11 +48,11 @@ body {
 /* input border animation */
 #link~.focus-border {
     position: absolute;
-    bottom: 8px;
+    bottom: 5px;
     left: 0;
     width: 0;
     height: 2px;
-    background-color: #4e9ce9;
+    background-color: rgb(78, 156, 233);
     transition: 0.4s;
 }
 
@@ -65,13 +66,13 @@ body {
     font-family: Urbanist;
     outline: none;
     border: none;
-    width: 309px;
-    height: 35px;
+    width: 609px;
+    height: 45px;
     border-radius: 3px 3px 7px 7px;
     background-color: rgb(0, 51, 80);
     color: rgb(189, 203, 214);
     transition: 0.4s cubic-bezier(0.23, 1, 0.320, 1);
-    margin-top: -6px;
+    margin-top: -7px;
 }
 
 #link-submit:hover {
@@ -86,10 +87,10 @@ body {
 #warning-message {
     font-family: Urbanist;
     color: red;
-    font-size: 10pt;
+    font-size: 12pt;
     margin-top: -7px;
 }
 
 #warning-message-container {
-    max-width: 308px;
+    max-width: 608px;
 }
