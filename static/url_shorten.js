@@ -72,7 +72,6 @@ window.addEventListener("load", function () {
             old_value = link_input.value
             link_input.style.border = 'thin solid red'
 
-            warning_message = document.getElementById('warning-message')
             warning_message.innerHTML = 'Oops! Something went wrong, please try again.'
 
             const warning_interval = setInterval(() => {
