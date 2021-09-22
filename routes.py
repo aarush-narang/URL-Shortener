@@ -120,7 +120,7 @@ def url_shorten():
     if ip_addr not in requests:  # if the ip is new, add it
         requests[ip_addr] = { 'last_minute': 1, 'last_day': 1, 'ratelimited': False }
     elif requests[ip_addr]['ratelimited']:  # if ip is ratelimited, restrict them from making more requests
-        return jsonify(valid='invalidURL', msg='Youv\'e been ratelimited because you sent too many requests, try again later.')
+        return jsonify(ratelimited=True, msg='Youv\'e been ratelimited because you sent too many requests, try again later.')
     else:  # otherwise, increment their request count and then check if they exceed their limit of requests
         requests[ip_addr]['last_minute'] += 1
         requests[ip_addr]['last_day'] += 1
@@ -128,12 +128,12 @@ def url_shorten():
             requests[ip_addr]['ratelimited'] = True
             requests[ip_addr]['last_minute'] = 0
             setTimeout(600, clearRateLimit)
-            return jsonify(valid='invalidURL', msg='Youv\'e been ratelimited because you sent too many requests, try again later.')
+            return jsonify(ratelimited=True, msg='Youv\'e been ratelimited because you sent too many requests, try again later.')
         if requests[ip_addr]['last_day'] >= 10000:  # if the ip exceeds the max number of requests, restrict them from making more requests
             requests[ip_addr]['ratelimited'] = True
             requests[ip_addr]['last_day'] = 0
             setTimeout(time_to_endofday(), clearRateLimit)
-            return jsonify(valid='invalidURL', msg='Youv\'e been ratelimited because you sent too many requests, try again later.')
+            return jsonify(ratelimited=True, msg='Youv\'e been ratelimited because you sent too many requests, try again later.')
 
     link_regex_1 = '(?!www\.)[a-zA-Z0-9._]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # google.com
     link_regex_2 = '(www\.)[a-zA-Z0-9._]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # www.google.com

@@ -8,19 +8,33 @@ function copy_short_link() {
 }
 
 window.addEventListener("load", function () {
-    function warn(respMsg) {
-        link_input = document.getElementById('link')
-        old_value = link_input.value
-        link_input.style.border = 'thin solid red'
+    const form = document.getElementById("link-form")
+    const input = document.getElementById("link")
+    const link_submit_button = document.getElementById('link-submit')
+    const warning_message = document.getElementById('warning-message')
+    let new_btn
+    function warn(respMsg) { // function that loads the warn/rate limit
+        old_value = input.value
+        input.style.border = 'thin solid red'
 
-        warning_message = document.getElementById('warning-message')
         warning_message.innerHTML = respMsg
 
         const warning_interval = setInterval(() => {
-            if(link_input.value != old_value) {
-                link_input.style.border = 'none'
+            if(input.value != old_value) {
+                input.style.border = 'none'
                 warning_message.innerHTML = ''
                 clearInterval(warning_interval)
+            }
+        }, 100);
+    }
+    function check_input_value(short_link) { // checks to see if the input value was changed
+        const input_check = setInterval(() => {
+            if (input.value != short_link) {
+                link_submit_button.value = 'Shorten'
+                link_submit_button.type = 'submit'
+                link_submit_button.style.width = '609px'
+                new_btn.remove()
+                clearInterval(input_check)
             }
         }, 100);
     }
@@ -29,19 +43,31 @@ window.addEventListener("load", function () {
             return warn(msg)
         }
         const XHR = new XMLHttpRequest();
-        XHR.addEventListener("load", function (event) {
+        XHR.addEventListener("load", function (event) { // when the response comes back
             resp = JSON.parse(event.target.responseText)
-            if (resp.valid === 'invalidURL') {
+            if (resp.ratelimited) { // check if the person is ratelimited
                 return warn(resp.msg)
             }
-            input.value = `${domain}${resp.short_link}`
-            check_input_value(`${domain}${resp.short_link}`)
-            link_submit_button.value = 'Copy'
+            input.value = `${domain}${resp.short_link}` // otherwise edit the input value to show the new shortened link
+            check_input_value(`${domain}${resp.short_link}`) // create an interval to check if the input is changed
+            link_submit_button.value = 'Copy' // change shorten button to copy button
             link_submit_button.type = 'button'
+            link_submit_button.style.width = '300px'
+
+            // create new btn that will open the link when clicked
+            new_btn = document.createElement('input')
+            const btns = document.getElementById('btns')
+            new_btn.value = 'Open'
+            new_btn.type = 'button'
+            new_btn.id = 'link-copy'
+            new_btn.style.width = '300px'
+            new_btn.style.textAlign = 'center'
+            new_btn.onclick = () => window.open(input.value)
+            btns.appendChild(new_btn)
 
             document.querySelector("#link-submit").addEventListener("click", copy_short_link);
         });
-        XHR.addEventListener("error", function (event) {
+        XHR.addEventListener("error", function (event) { // if error happens on backend
             link_input = document.getElementById('link')
             old_value = link_input.value
             link_input.style.border = 'thin solid red'
@@ -59,7 +85,7 @@ window.addEventListener("load", function () {
         });
 
         const IP_XHR = new XMLHttpRequest();
-        IP_XHR.addEventListener('load', function (event) {
+        IP_XHR.addEventListener('load', function (event) { // load the response from getting the ip (for ratelimiting)
             IP = JSON.parse(event.target.responseText).ip
 
             XHR.open("POST", "/url_shorten");
@@ -68,19 +94,8 @@ window.addEventListener("load", function () {
         IP_XHR.open('GET', 'https://api.ipify.org?format=json');
         IP_XHR.send();
     }
-    function check_input_value(short_link) {
-        const input_check = setInterval(() => {
-            if (input.value != short_link) {
-                link_submit_button.value = 'Shorten'
-                link_submit_button.type = 'submit'
-                clearInterval(input_check)
-            }
-        }, 100);
-    }
-    const form = document.getElementById("link-form")
-    const input = document.getElementById("link")
-    const link_submit_button = document.getElementById('link-submit')
-    form.addEventListener("submit", function (event) {
+    
+    form.addEventListener("submit", function (event) { // when "Shorten" button is clicked this will trigger
         event.preventDefault();
         const link_regex_1 = /(?!www\.)[a-zA-Z0-9._]{2,256}\.[a-z0-9:]{2,6}([-a-zA-Z0-9._]*)/g  // google.com
         const link_regex_2 = /(www\.)[a-zA-Z0-9._]{2,256}\.[a-z0-9:]{2,6}([-a-zA-Z0-9._]*)/g  // www.google.com
