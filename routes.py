@@ -4,7 +4,6 @@ import json
 import hashlib, random
 import re
 import threading, time, datetime
-import math
 
 MONGO_DB_URI = os.getenv('MONGO_DB_URI')
 PROJ_PATH = os.getenv('PROJ_PATH')
