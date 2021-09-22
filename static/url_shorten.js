@@ -45,7 +45,7 @@ window.addEventListener("load", function () {
         const XHR = new XMLHttpRequest();
         XHR.addEventListener("load", function (event) { // when the response comes back
             resp = JSON.parse(event.target.responseText)
-            if (resp.ratelimited) { // check if the person is ratelimited
+            if (resp.error) { // check if the person is ratelimited
                 return warn(resp.msg)
             }
             input.value = `${domain}${resp.short_link}` // otherwise edit the input value to show the new shortened link
