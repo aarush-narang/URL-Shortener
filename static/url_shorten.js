@@ -105,6 +105,6 @@ window.addEventListener("load", function () {
         } else if(input.value.match(/((http:\/\/)?192\.168\.68\.127:3000\/)(.+)/g)) {
             return sendData(true, 'That is already a shortened link!')
         }
-        sendData();
+        return sendData();
     });
 });

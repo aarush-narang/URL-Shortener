@@ -1,18 +1,16 @@
 from flask import Blueprint, render_template, redirect, request, jsonify, send_file, abort
-import pymongo, os
+import pymongo, certifi, os
 import json
-import hashlib
+import hashlib, random
 import re
 import threading, time, datetime
-import certifi
-import random
-
+import math
 
 MONGO_DB_URI = os.getenv('MONGO_DB_URI')
 PROJ_PATH = os.getenv('PROJ_PATH')
 client = pymongo.MongoClient(MONGO_DB_URI, tlsCAFile=certifi.where())  # you could also use sql db for this
 db = client.url_shortener  # url_shortener is database name
-requests = {}  # record all ip addresses and # of requests from each
+requests = {}  # record all ip addresses and # of requests from each and the time they got ratelimted (to see how much longer their ratelimit will last)
 
 class setInterval:  # this is like the setInterval function in javascript
     def __init__(self,interval,action) :
@@ -118,22 +116,24 @@ def url_shorten():
     ip_addr = json.loads(data)['ip']  # ip addr from request
 
     if ip_addr not in requests:  # if the ip is new, add it
-        requests[ip_addr] = { 'last_minute': 1, 'last_day': 1, 'ratelimited': False }
+        requests[ip_addr] = { 'last_minute': 1, 'last_day': 1, 'ratelimited': False, 'ratelimit_off_time': None }
     elif requests[ip_addr]['ratelimited']:  # if ip is ratelimited, restrict them from making more requests
-        return jsonify(error=True, msg='Youv\'e been ratelimited because you sent too many requests, try again later.')
+        return jsonify(error=True, msg=f'Youv\'e been ratelimited because you sent too many requests, try again after {round(requests[ip_addr]["ratelimit_off_time"] - time.time(), 1)} seconds')
     else:  # otherwise, increment their request count and then check if they exceed their limit of requests
         requests[ip_addr]['last_minute'] += 1
         requests[ip_addr]['last_day'] += 1
         if requests[ip_addr]['last_minute'] >= 1000:  # if the ip exceeds the max number of requests, restrict them from making more requests
             requests[ip_addr]['ratelimited'] = True
             requests[ip_addr]['last_minute'] = 0
+            requests[ip_addr]['ratelimit_off_time'] = time.time() + 600
             setTimeout(600, clearRateLimit)
-            return jsonify(error=True, msg='Youv\'e been ratelimited because you sent too many requests, try again later.')
+            return jsonify(error=True, msg=f'Youv\'e been ratelimited because you sent too many requests, try again after {round(requests[ip_addr]["ratelimit_off_time"] - time.time(), 1)} seconds')
         if requests[ip_addr]['last_day'] >= 10000:  # if the ip exceeds the max number of requests, restrict them from making more requests
             requests[ip_addr]['ratelimited'] = True
             requests[ip_addr]['last_day'] = 0
+            requests[ip_addr]['ratelimit_off_time'] = time.time() + time_to_endofday()
             setTimeout(time_to_endofday(), clearRateLimit)
-            return jsonify(error=True, msg='Youv\'e been ratelimited because you sent too many requests, try again later.')
+            return jsonify(error=True, msg=f'Youv\'e been ratelimited because you sent too many requests, try again after {round(requests[ip_addr]["ratelimit_off_time"] - time.time(), 1)} seconds')
 
     link_regex_1 = '(?!www\.)[a-zA-Z0-9._]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # google.com
     link_regex_2 = '(www\.)[a-zA-Z0-9._]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # www.google.com
