@@ -12,7 +12,7 @@ window.addEventListener("load", function () {
     const input = document.getElementById("link")
     const link_submit_button = document.getElementById('link-submit')
     const warning_message = document.getElementById('warning-message')
-    let new_btn
+    let open_btn
     function warn(respMsg) { // function that loads the warn/rate limit
         old_value = input.value
         input.style.border = 'thin solid red'
@@ -28,12 +28,13 @@ window.addEventListener("load", function () {
         }, 100);
     }
     function check_input_value(short_link) { // checks to see if the input value was changed
-        const input_check = setInterval(() => {
+        const input_check = setInterval(() => { // make the "copy link" button and "open link" buttons disappear and only show the "shorten" button
             if (input.value != short_link) {
                 link_submit_button.value = 'Shorten'
                 link_submit_button.type = 'submit'
                 link_submit_button.style.width = '609px'
-                new_btn.remove()
+                open_btn.style.width = '0px'
+                open_btn.style.display = 'none'
                 clearInterval(input_check)
             }
         }, 100);
@@ -54,16 +55,11 @@ window.addEventListener("load", function () {
             link_submit_button.type = 'button'
             link_submit_button.style.width = '300px'
 
-            // create new btn that will open the link when clicked
-            new_btn = document.createElement('input')
-            const btns = document.getElementById('btns')
-            new_btn.value = 'Open Link'
-            new_btn.type = 'button'
-            new_btn.id = 'link-copy'
-            new_btn.style.width = '300px'
-            new_btn.style.textAlign = 'center'
-            new_btn.onclick = () => window.open(input.value)
-            btns.appendChild(new_btn)
+            // make the "open link" btn appear and will open the link when clicked
+            open_btn = document.getElementById('link-open')
+            open_btn.style.display = 'block'
+            open_btn.style.width = '300px'
+            open_btn.onclick = () => window.open(input.value)
 
             document.querySelector("#link-submit").addEventListener("click", copy_short_link);
         });

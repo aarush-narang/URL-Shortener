@@ -68,7 +68,7 @@ body {
     justify-content: space-between;
 }
 
-#link-submit, #link-copy {
+#link-submit, #link-open {
     font-family: Urbanist;
     outline: none;
     border: none;
@@ -81,11 +81,11 @@ body {
     margin-top: -7px;
 }
 
-#link-submit:hover, #link-copy:hover {
+#link-submit:hover, #link-open:hover {
     background-color: rgb(4, 78, 121);
 }
 
-#link-submit:active, #link-copy:active {
+#link-submit:active, #link-open:active {
     background-color: rgb(11, 69, 102);
 }
 
