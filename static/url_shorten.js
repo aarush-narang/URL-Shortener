@@ -58,7 +58,7 @@ window.addEventListener("load", function () {
             // make the "open link" btn appear and will open the link when clicked
             open_btn = document.getElementById('link-open')
             open_btn.style.display = 'block'
-            open_btn.style.width = '300px'
+            open_btn.style.width = '302px'
             open_btn.onclick = () => window.open(input.value)
 
             document.querySelector("#link-submit").addEventListener("click", copy_short_link);
@@ -98,7 +98,7 @@ window.addEventListener("load", function () {
         const link_regex_4 = /((http|https):\/\/)(www\.)[a-zA-Z0-9._]{2,256}\.[a-z0-9:]{2,6}([-a-zA-Z0-9._]*)/g  // https://www.google.com
         if (input.value === '' || (!input.value.match(link_regex_1) && !input.value.match(link_regex_2) && !input.value.match(link_regex_3) && !input.value.match(link_regex_4))) {
             return sendData(true, 'Please enter a valid URL!');
-        } else if(input.value.match(/((http:\/\/)?192\.168\.68\.127:3000\/)(.+)/g)) {
+        } else if(input.value.match(/((http:\/\/)?10\.18\.84\.212:3000\/)(.+)/g)) {
             return sendData(true, 'That is already a shortened link!')
         }
         return sendData();
