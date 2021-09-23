@@ -53,7 +53,7 @@ window.addEventListener("load", function () {
             check_input_value(`${domain}${resp.short_link}`) // create an interval to check if the input is changed
             link_submit_button.value = 'Copy Link' // change shorten button to copy button
             link_submit_button.type = 'button'
-            link_submit_button.style.width = '300px'
+            link_submit_button.style.width = '302px'
 
             // make the "open link" btn appear and will open the link when clicked
             open_btn = document.getElementById('link-open')
