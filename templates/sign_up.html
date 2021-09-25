@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../templates/sign_up.css">
+    <script type="text/javascript" src="../static/sign_up.js"></script>
+    <script type="text/javascript" src="../static/bundle.js"></script>
+    <title>Sign Up</title>
+</head>
+
+<body>
+    <header>
+        <button class="header-buttons" id='return-home'>Return To Home</button>
+    </header>
+    <div class="form-container">
+        <form autocomplete="off" spellcheck="false" id='sign-up-form'>
+            <div>
+                <div class="container">
+                    <label for="email">Email:</label>
+                    <input id='email' type="text" name="email" placeholder="johndoe@gmail.com">
+                    <span class='focus-border'></span>
+                </div>
+                <div class="warning-message-container">
+                    <p id="warning-message-email"></p>
+                </div>
+            </div>
+            <div>
+                <div class="container">
+                    <div id='pass-label-container'>
+                        <label for="password">Password:</label>
+                        <a id='pass-show'>show</a>
+                    </div>
+                    <input id="password" type="password" name="password">
+                    <span class='focus-border'></span>
+                </div>
+                <div class="warning-message-container">
+                    <p id="warning-message-password"></p>
+                </div>
+            </div>
+            <div id="verif-pass">
+                <div class="container">
+                    <div id='pass-label-container'>
+                        <label for="password">Re-enter Password:</label>
+                        <a id='v-pass-show'>show</a>
+                    </div>
+                    <input id="verify-password" type="password" name="password">
+                    <span class='focus-border'></span>
+                </div>
+                <div class="warning-message-container">
+                    <p id="warning-message-verify-password"></p>
+                </div>
+            </div>
+            <div>
+                <div>
+                    <div id='password-requirements'>
+                        <p id='msg-lower'>At least 3 lowercase letters</p>
+                        <p id='msg-upper'>At least 2 uppercase letters</p>
+                        <p id='msg-number'>At least 2 numbers</p>
+                        <p id='msg-special'>At least 1 special character</p>
+                        <p id='msg-total'>At least 8 characters long</p>
+                    </div>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="submit" id='sign-up-submit' value="Sign Up"></input>
+                </div>
+                <div class="warning-message-container">
+                    <p id="warning-message"></p>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

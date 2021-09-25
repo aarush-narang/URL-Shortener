@@ -2,18 +2,24 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" type="text/css" href="../templates/home.css">
     <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../templates/home.css">
+    <script type="text/javascript" src="../static/url_shorten.js" domain={{domain}} port={{port}}></script>
     <title>Home</title>
 </head>
 
 <body>
+    <header class='header'>
+        <button id='sign-in' class='header-buttons'>Sign In</button>
+        <button id='sign-up' class='header-buttons'>Sign Up</button>
+    </header>
     <div id='form-holder'>
         <form autocomplete="off" spellcheck="false" id='link-form'>
             <div>
                 <label id='link-label' for="link">Enter Link:</label>
                 <div class="container">
                     <input type="text" id="link" name="link" placeholder="www.example.com">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <span class='focus-border'></span>
                 </div>
             </div>
@@ -26,7 +32,6 @@
             </div>
         </form>
     </div>
-    <script type="text/javascript" src="../static/url_shorten.js" domain={{domain}} port={{port}}></script>
 </body>
 
 </html>

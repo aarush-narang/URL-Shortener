@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../templates/sign_in.css">
+    <script type="text/javascript" src="../static/sign_in.js"></script>
+    <script type="text/javascript" src="../static/bundle.js"></script>
+    <title>Sign In</title>
+</head>
+
+<body>
+    <header>
+        <button class="header-buttons" id='return-home'>Return To Home</button>
+    </header>
+    <div class="form-container">
+        <form autocomplete="off" spellcheck="false" id='sign-in-form'>
+            <div class="container">
+                <label for="email">Email:</label>
+                <input id='email' type="text" name="email" placeholder="johndoe@gmail.com">
+                <span class='focus-border'></span>
+            </div>
+            <div class="warning-message-container">
+                <p id="warning-message-email"></p>
+            </div>
+            <div>
+                <div class="container">
+                    <div id='pass-label-container'>
+                        <label for="password">Password:</label>
+                        <a id='pass-show'>show</a>
+                    </div>
+                    <input id="password" type="password" name="password">
+                    <span class='focus-border'></span>
+                </div>
+                <div class="warning-message-container">
+                    <p id="warning-message-password"></p>
+                </div>
+            </div>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="submit" id='sign-in-submit' value="Sign In"></input>
+            <div class="warning-message-container">
+                <p id="warning-message"></p>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

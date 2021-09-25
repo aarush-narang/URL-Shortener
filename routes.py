@@ -1,4 +1,6 @@
-from flask import Blueprint, render_template, redirect, request, jsonify, send_file, abort
+from flask import Blueprint, render_template, redirect, request, jsonify, send_file, abort, session
+import flask
+from flask_wtf import csrf
 import pymongo, certifi, os
 import json
 import hashlib, random
@@ -8,8 +10,10 @@ import threading, time, datetime
 MONGO_DB_URI = os.getenv('MONGO_DB_URI')
 PROJ_PATH = os.getenv('PROJ_PATH')
 client = pymongo.MongoClient(MONGO_DB_URI, tlsCAFile=certifi.where())  # you could also use sql db for this
-db = client.url_shortener  # url_shortener is database name
+url_db = client.url_shortener  # url_shortener is collection name, contains the short link and main link
+users_db = client.users # contains user signin information (username, password)
 requests = {}  # record all ip addresses and # of requests from each and the time they got ratelimted (to see how much longer their ratelimit will last)
+
 
 class setInterval:  # this is like the setInterval function in javascript
     def __init__(self,interval,action) :
@@ -46,7 +50,6 @@ def time_to_endofday(dt=None):  # number of seconds until the day ends
     tomorrow = dt + datetime.timedelta(days=1)
     return (datetime.datetime.combine(tomorrow, datetime.time.min) - dt).total_seconds()
 
-
 def short_link(link, char_length=7):
     # short link length
     char_length = 7
@@ -72,6 +75,7 @@ def short_link(link, char_length=7):
 
 
 router = Blueprint(__name__, 'routes')
+
 @router.route('/')
 def home_redirect():
     return redirect('/home')
@@ -84,7 +88,7 @@ def home():
 
 @router.route('/<short_link>')
 def existing_link(short_link):
-    redirect_url = db.urls.find({'short_link': short_link})
+    redirect_url = url_db.urls.find({'short_link': short_link})
     for x in redirect_url:
         return redirect(x['link'])
     return render_template('404.html')
@@ -94,7 +98,10 @@ def existing_link(short_link):
 def url_shorten():
     link_size = 7  # the number of characters at the end of the link example.com/thisstuff
     data = request.data.decode()  # request data, the link they want to shorten
-    link = json.loads(data)['link']  # convert from json to dict
+    data = json.loads(data) # convert from json to dict
+
+    ip_addr = data['ip']  # ip address from request
+    link = data['link'] # link they entered
 
     # ratelimiting
     # starting intervals that clear the number of requests per min/hr
@@ -112,7 +119,6 @@ def url_shorten():
     startInterval(60, clearMinuteNumbers)
     startInterval(86400, clearDayNumbers)
 
-    ip_addr = json.loads(data)['ip']  # ip addr from request
 
     if ip_addr not in requests:  # if the ip is new, add it
         requests[ip_addr] = { 'last_minute': 1, 'last_day': 1, 'ratelimited': False, 'ratelimit_off_time': None }
@@ -155,21 +161,21 @@ def url_shorten():
 
 
     # check if link is already in db
-    link_check = db.urls.find({'link': link.lower() }) 
+    link_check = url_db.urls.find({'link': link.lower() }) 
     for link in link_check:
         return jsonify(short_link=link['short_link'])
         
     # shorten the link
     short_url = short_link(link, link_size)  
 
-    short_link_check = db.urls.find({'short_link': short_url})  # check if short link is already in db
+    short_link_check = url_db.urls.find({'short_link': short_url})  # check if short link is already in db
     for db_link in short_link_check:  # if link already in db
         if link in db_link['link'] :  # check if the db link is the same they want
             return jsonify(short_link=db_link['short_link'])  #  if so return that short link
         else:
             while True:  # otherwise keep generating short links with 1 more character until it gets one not in the db
                 new_link = short_link(link, link_size+1)
-                link_check = db.urls.find({'short_link': new_link})
+                link_check = url_db.urls.find({'short_link': new_link})
                 old_db_link = ''
                 for db_link in link_check:
                     old_db_link = db_link
@@ -178,14 +184,54 @@ def url_shorten():
                 short_url = new_link
                 break
 
-    link_check = db.urls.find({'link': link}) # check if link is already in db
+    link_check = url_db.urls.find({'link': link}) # check if link is already in db
     for link in link_check:
         return jsonify(short_link=link['short_link'])
 
-    db.urls.insert_one(
+    url_db.urls.insert_one(
         { 'link': link, 'short_link': short_url }
     )
     return jsonify(short_link=short_url)
+
+
+
+@router.route('/sign_in', methods=['GET', 'POST'])
+def sign_in():
+    if flask.request.method == 'GET':
+        return render_template('sign_in.html')
+    else:
+        data = request.data.decode()
+        data = json.loads(data)
+        email = data['email']
+        encrypted_password = data['password']
+
+        print(email, encrypted_password)
+
+        email_check = users_db.users.find({'email': email})
+        for user in email_check:
+            if user['password'] == encrypted_password:
+                return # login thing here with sessions (cookies)
+            else:
+                return jsonify(msg='INVALID_PASSWORD')
+
+        return jsonify(msg='INVALID_EMAIL')
+
+
+
+@router.route('/sign_up', methods=['GET', 'POST'])
+def sign_up():
+    if flask.request.method == 'GET':
+        return render_template('sign_up.html')
+    else:
+        data = request.data.decode()
+        print(data)
+        # users_db.users.insert_one(
+        #     { 'email': email, 'password': encrypted_password }
+        # )
+        return jsonify(msg='received')
+
+
+
 
 
 @router.get('/images/<img_name>')

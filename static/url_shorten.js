@@ -1,5 +1,4 @@
 const script = document.currentScript
-const domain = `http://${script.getAttribute('domain')}:${script.getAttribute('port')}/`
 
 function copy_short_link() {
     const copyText = document.querySelector("#link");
@@ -8,10 +7,18 @@ function copy_short_link() {
 }
 
 window.addEventListener("load", function () {
+    const sign_in_btn = document.getElementById('sign-in') // sign-in/sign-up buttons
+    sign_in_btn.onclick = () => window.location = '/sign_in'
+    const sign_up_btn = document.getElementById('sign-up')
+    sign_up_btn.onclick = () => window.location = '/sign_up'
+
+    const domain = `https://${script.getAttribute('domain')}:${script.getAttribute('port')}/`
     const form = document.getElementById("link-form")
     const input = document.getElementById("link")
     const link_submit_button = document.getElementById('link-submit')
     const warning_message = document.getElementById('warning-message')
+    const token = document.getElementsByName('csrf_token') // CSRF Token for authorization
+    
     let open_btn
     function warn(respMsg) { // function that loads the warn/rate limit
         old_value = input.value
@@ -45,7 +52,11 @@ window.addEventListener("load", function () {
         }
         const XHR = new XMLHttpRequest();
         XHR.addEventListener("load", function (event) { // when the response comes back
+            if(event.target.status === 400) { // if request is denied (400 status) warn them
+                return warn('Oops! Something went wrong, please refresh your page and try again.')
+            }
             resp = JSON.parse(event.target.responseText)
+
             if (resp.error) { // check if the person is ratelimited
                 return warn(resp.msg)
             }
@@ -79,11 +90,12 @@ window.addEventListener("load", function () {
             }, 100);
         });
 
+
         const IP_XHR = new XMLHttpRequest();
         IP_XHR.addEventListener('load', function (event) { // load the response from getting the ip (for ratelimiting)
             IP = JSON.parse(event.target.responseText).ip
-
             XHR.open("POST", "/url_shorten");
+            XHR.setRequestHeader('X-CSRFToken', token[0].getAttribute('value'))
             XHR.send(JSON.stringify({ "link": input.value, 'ip': IP }));
         })
         IP_XHR.open('GET', 'https://api.ipify.org?format=json');
@@ -98,7 +110,7 @@ window.addEventListener("load", function () {
         const link_regex_4 = /((http|https):\/\/)(www\.)[a-zA-Z0-9._]{2,256}\.[a-z0-9:]{2,6}([-a-zA-Z0-9._]*)/g  // https://www.google.com
         if (input.value === '' || (!input.value.match(link_regex_1) && !input.value.match(link_regex_2) && !input.value.match(link_regex_3) && !input.value.match(link_regex_4))) {
             return sendData(true, 'Please enter a valid URL!');
-        } else if(input.value.match(/((http:\/\/)?192\.168\.68\.127:3000\/)(.+)/g)) {
+        } else if(input.value.includes(domain)) {
             return sendData(true, 'That is already a shortened link!')
         }
         return sendData();
