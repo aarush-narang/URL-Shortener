@@ -4,10 +4,7 @@ import os
 from flask_wtf import CSRFProtect
 
 app = Flask(__name__)
-app.config.update(
-    DEBUG=True,
-    SECRET_KEY='VDRjuh9aEMa8LvLaz5GhtZVqYVybdyF7VGPQU2Ev'
-)
+app.secret_key = os.getenv('FLASK_SECRET_KEY')
 
 csrf = CSRFProtect()
 csrf.init_app(app)
@@ -19,4 +16,4 @@ def pagenotfound(e):
     return render_template('404.html')
 
 if __name__ == '__main__':
-    app.run(host=os.getenv('DOMAIN'), port=os.getenv('PORT'), ssl_context=('cert.pem', 'key.pem')) # certificates for https
+    app.run(host=os.getenv('DOMAIN'), port=os.getenv('PORT'), ssl_context=('cert.pem', 'key.pem'), debug=True) # certificates for https

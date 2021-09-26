@@ -25,11 +25,29 @@ window.addEventListener("load", function () {
         const encrypted_pass = window.shajs('sha512').update(password.value).digest('hex')
         const signinXHR = new XMLHttpRequest()
         signinXHR.addEventListener('load', (event) => {
-            //console.log(event)
-            // get user id here to store cookie
+            resp = JSON.parse(event.target.response)
+            if(resp.msg === 'INVALID_EMAIL' || resp.msg === 'INVALID_PASSWORD') {
+                sign_in_form.reset()
+                old_email = email.value
+                email.style.border = '1px solid red'
+                email_warning.style.display = 'block'
+                email_warning.innerHTML = 'Your email or password is incorrect.'
+                const emailInterval = setInterval(() => {
+                    if(email.value != old_email) {
+                        email.style.border = 'none'
+                        email_warning.style.display = 'none'
+                        email_warning.innerHTML = ''
+                        clearInterval(emailInterval)
+                    }
+                }, 100);
+            } else if(resp.msg === 'LOGGED_IN') {
+                return window.location = '/home'
+            }
         })
         signinXHR.addEventListener('error', (event) => {
-            console.log('error')
+            general_warning.style.display = 'block'
+            general_warning.innerHTML = 'Oops! Something went wrong, try refreshing the page and try again.'
+            return
         })
 
         signinXHR.open('POST', '/sign_in')

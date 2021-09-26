@@ -4,14 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="../templates/home.css">
-    <script type="text/javascript" src="../static/url_shorten.js" domain={{domain}} port={{port}}></script>
+    <script type="text/javascript" src="../static/url_shorten.js" domain={{domain}} port={{port}} user='{{user}}'></script>
+    <script type="text/javascript" src="../static/header.js" user='{{user}}'></script>
+    
     <title>Home</title>
 </head>
-
 <body>
     <header class='header'>
-        <button id='sign-in' class='header-buttons'>Sign In</button>
-        <button id='sign-up' class='header-buttons'>Sign Up</button>
+        <button style="display: none;" id='sign-in' class='header-buttons'>Sign In</button>
+        <button style="display: none;" id='sign-up' class='header-buttons'>Sign Up</button>
+        <div style="display: none;" id='dropdown-container' data-dropdown>
+            <button id='dropdown-button' class='header-buttons' data-dropdown-button>{{user}}</button>
+            <div id='dropdown'>
+                <a href="/mylinks">My Links</a>
+                <a href="/settings">Settings</a>
+                <a href="/logout">Log Out</a>
+            </div>
+        </div>
     </header>
     <div id='form-holder'>
         <form autocomplete="off" spellcheck="false" id='link-form'>

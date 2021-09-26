@@ -7,11 +7,6 @@ function copy_short_link() {
 }
 
 window.addEventListener("load", function () {
-    const sign_in_btn = document.getElementById('sign-in') // sign-in/sign-up buttons
-    sign_in_btn.onclick = () => window.location = '/sign_in'
-    const sign_up_btn = document.getElementById('sign-up')
-    sign_up_btn.onclick = () => window.location = '/sign_up'
-
     const domain = `https://${script.getAttribute('domain')}:${script.getAttribute('port')}/`
     const form = document.getElementById("link-form")
     const input = document.getElementById("link")
@@ -104,10 +99,10 @@ window.addEventListener("load", function () {
     
     form.addEventListener("submit", function (event) { // when "Shorten" button is clicked this will trigger
         event.preventDefault();
-        const link_regex_1 = /(?!www\.)[a-zA-Z0-9._]{2,256}\.[a-z0-9:]{2,6}([-a-zA-Z0-9._]*)/g  // google.com
-        const link_regex_2 = /(www\.)[a-zA-Z0-9._]{2,256}\.[a-z0-9:]{2,6}([-a-zA-Z0-9._]*)/g  // www.google.com
-        const link_regex_3 = /((http|https):\/\/)(?!www\.)[a-zA-Z0-9._]{2,256}\.[a-z0-9:]{2,6}([-a-zA-Z0-9._]*)/g  // https://google.com
-        const link_regex_4 = /((http|https):\/\/)(www\.)[a-zA-Z0-9._]{2,256}\.[a-z0-9:]{2,6}([-a-zA-Z0-9._]*)/g  // https://www.google.com
+        const link_regex_1 = /(?!www\.)[a-zA-Z0-9._]{2,256}\.[a-z0-9:]{2,6}([-a-zA-Z0-9._]*)/gy  // google.com
+        const link_regex_2 = /(www\.)[a-zA-Z0-9._]{2,256}\.[a-z0-9:]{2,6}([-a-zA-Z0-9._]*)/gy  // www.google.com
+        const link_regex_3 = /((http|https):\/\/)(?!www\.)[a-zA-Z0-9._]{2,256}\.[a-z0-9:]{2,6}([-a-zA-Z0-9._]*)/gy  // https://google.com
+        const link_regex_4 = /((http|https):\/\/)(www\.)[a-zA-Z0-9._]{2,256}\.[a-z0-9:]{2,6}([-a-zA-Z0-9._]*)/gy  // https://www.google.com
         if (input.value === '' || (!input.value.match(link_regex_1) && !input.value.match(link_regex_2) && !input.value.match(link_regex_3) && !input.value.match(link_regex_4))) {
             return sendData(true, 'Please enter a valid URL!');
         } else if(input.value.includes(domain)) {

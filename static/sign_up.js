@@ -72,10 +72,10 @@ window.addEventListener("load", function () {
     }
     verif_show_pass.onclick = () => {
         if(verif_pass.type === 'password') {
-            show_pass.innerHTML = 'hide'
+            verif_show_pass.innerHTML = 'hide'
             verif_pass.type = 'text'
         } else {
-            show_pass.innerHTML = 'show'
+            verif_show_pass.innerHTML = 'show'
             verif_pass.type = 'password'
         }
     }
@@ -92,7 +92,34 @@ window.addEventListener("load", function () {
         const encrypted_pass = window.shajs('sha512').update(password.value).digest('hex')
         const signupXHR = new XMLHttpRequest()
         signupXHR.addEventListener('load', (event) => {
-            //console.log(event)
+            const resp = JSON.parse(event.target.response)
+            if(resp.msg === 'EXISTING_EMAIL') {
+                sign_up_form.reset()
+                old_email = email.value
+                email.style.border = '1px solid red'
+                email_warning.style.display = 'block'
+                email_warning.innerHTML = 'An account with this email already exists.'
+                const emailInterval = setInterval(() => {
+                    if(email.value != old_email) {
+                        email.style.border = 'none'
+                        email_warning.style.display = 'none'
+                        email_warning.innerHTML = ''
+                        clearInterval(emailInterval)
+                    }
+                }, 100);
+            } else if(resp.msg === 'SIGNED_UP') {
+                const signinXHR = new XMLHttpRequest()
+                signinXHR.addEventListener('load', (event) => {
+                    return window.location = '/home'
+                })
+                signinXHR.addEventListener('error', (event) => {
+                    console.log('error')
+                })
+
+                signinXHR.open('POST', '/sign_in')
+                signinXHR.setRequestHeader('X-CSRFToken', token[0].getAttribute('value'))
+                signinXHR.send(JSON.stringify({ "email": email.value, "password": encrypted_pass }))
+            }
         })
         signupXHR.addEventListener('error', (event) => {
             general_warning.style.display = 'block'
@@ -100,7 +127,7 @@ window.addEventListener("load", function () {
             return
         })
 
-        signupXHR.open('POST', '/sign_in')
+        signupXHR.open('POST', '/sign_up')
         signupXHR.setRequestHeader('X-CSRFToken', token[0].getAttribute('value'))
         signupXHR.send(JSON.stringify({ "email": email.value, "password": encrypted_pass }))
     }
@@ -123,7 +150,7 @@ window.addEventListener("load", function () {
                     clearInterval(emailInterval)
                 }
             }, 100);
-        } else if(!password_regex.test(password.value)) { //check for valid password
+        } else if(!password_regex.test(password.value) || password.value.includes(' ')) { //check for valid password
             old_password = password.value
             password.style.border = '1px solid red'
             pass_warning.style.display = 'block'

@@ -1,6 +1,5 @@
-from flask import Blueprint, render_template, redirect, request, jsonify, send_file, abort, session
-import flask
-from flask_wtf import csrf
+from flask import Blueprint, render_template, redirect, request, jsonify, send_file, abort, session, make_response
+from flask.helpers import url_for
 import pymongo, certifi, os
 import json
 import hashlib, random
@@ -9,11 +8,10 @@ import threading, time, datetime
 
 MONGO_DB_URI = os.getenv('MONGO_DB_URI')
 PROJ_PATH = os.getenv('PROJ_PATH')
-client = pymongo.MongoClient(MONGO_DB_URI, tlsCAFile=certifi.where())  # you could also use sql db for this
-url_db = client.url_shortener  # url_shortener is collection name, contains the short link and main link
-users_db = client.users # contains user signin information (username, password)
+client = pymongo.MongoClient(MONGO_DB_URI, tlsCAFile=certifi.where(), connect=True)  # you could also use sql db for this
+url_db = client.url_shortener  # url_shortener is collection name, contains the short link and main link, also contains user signin information (userid, username, password)
 requests = {}  # record all ip addresses and # of requests from each and the time they got ratelimted (to see how much longer their ratelimit will last)
-
+last_user_id = {'user_id': '1000000000'}
 
 class setInterval:  # this is like the setInterval function in javascript
     def __init__(self,interval,action) :
@@ -73,6 +71,10 @@ def short_link(link, char_length=7):
     
     return new_link[bound:bound+char_length]
 
+def getLastDBUserId(): # store the last user_id from the db in memory and every time a new acct is created, increment by 1
+    last_user = url_db.users.find({}).sort("user_id", pymongo.DESCENDING).limit(1)
+    for x in last_user:
+        last_user_id['user_id'] = x['user_id']
 
 router = Blueprint(__name__, 'routes')
 
@@ -83,7 +85,20 @@ def home_redirect():
 
 @router.route('/home')
 def home():
-    return render_template('home.html', domain=os.getenv('DOMAIN'), port=os.getenv('PORT'))
+    user = request.cookies.get('user_id')
+    
+    if len(session) > 1 and session['user_id'] == user: # check if there is a user id in their session and if there is check if it matches with the one in their cookies
+        try:
+            db_user = url_db.users.find({ 'user_id': user })[0]['email'] # if it matches, find the user and get the email
+        except IndexError: # if the user is not found, delete their cookie and send an "unauthorized" http response
+            res = make_response({ "msg": "Unauthorized" }, 401)
+            res.delete_cookie('user_id')
+            del session['user_id']
+            return res
+
+        return render_template('home.html', domain=os.getenv('DOMAIN'), port=os.getenv('PORT'), user=db_user) # pass in the email when rendering template
+    else:
+        return render_template('home.html', domain=os.getenv('DOMAIN'), port=os.getenv('PORT'))
 
 
 @router.route('/<short_link>')
@@ -102,7 +117,7 @@ def url_shorten():
 
     ip_addr = data['ip']  # ip address from request
     link = data['link'] # link they entered
-
+    
     # ratelimiting
     # starting intervals that clear the number of requests per min/hr
     def clearMinuteNumbers():
@@ -194,10 +209,12 @@ def url_shorten():
     return jsonify(short_link=short_url)
 
 
-
 @router.route('/sign_in', methods=['GET', 'POST'])
 def sign_in():
-    if flask.request.method == 'GET':
+    if request.method == 'GET':
+        user = request.cookies.get('user_id') # if they are already signed in, redirect them back to home
+        if len(session) > 1 and user and session['user_id'] == user:
+            return redirect('/home')
         return render_template('sign_in.html')
     else:
         data = request.data.decode()
@@ -205,34 +222,50 @@ def sign_in():
         email = data['email']
         encrypted_password = data['password']
 
-        print(email, encrypted_password)
-
-        email_check = users_db.users.find({'email': email})
-        for user in email_check:
-            if user['password'] == encrypted_password:
-                return # login thing here with sessions (cookies)
+        email_check = url_db.users.find({ 'email': email }) # check if email exists
+        for user in email_check: 
+            if user['password'] == encrypted_password: # check if password matches email (if it exists)
+                res = make_response({ 'msg': 'LOGGED_IN' }) # make a response
+                res.set_cookie(key='user_id', value=user['user_id'], max_age=604800, secure=True, httponly=True) # add cookie with user id
+                session['user_id'] = user['user_id'] # add user id to their session so they cant edit their cookie and go to someone else's account
+                return res
             else:
                 return jsonify(msg='INVALID_PASSWORD')
 
         return jsonify(msg='INVALID_EMAIL')
 
 
+@router.get('/logout')
+def logout():
+    user = request.cookies.get('user_id') # check if they are signed in
+    if len(session) > 1 and user and session['user_id'] == user:
+        res = make_response(redirect('/home'))
+        res.delete_cookie('user_id') # deleting their cookie
+        del session['user_id']
+        return res
+    return redirect('/home')
 
+getLastDBUserId()
 @router.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
-    if flask.request.method == 'GET':
+    if request.method == 'GET':
+        user = request.cookies.get('user_id') # if they are already signed in, redirect them back to home
+        if len(session) > 1 and user and session['user_id'] == user:
+            return redirect('/home')
         return render_template('sign_up.html')
     else:
         data = request.data.decode()
-        print(data)
-        # users_db.users.insert_one(
-        #     { 'email': email, 'password': encrypted_password }
-        # )
-        return jsonify(msg='received')
-
-
-
-
+        data = json.loads(data)
+        email = data['email']
+        email_check = url_db.users.find({ 'email': email }) # check if email exists
+        for user in email_check:
+            return jsonify(msg='EXISTING_EMAIL')
+        password = data['password']
+        last_user_id['user_id'] = str(int(last_user_id['user_id'])+1) # add on to the previous user id
+        url_db.users.insert_one(
+            { 'user_id': last_user_id['user_id'], 'email': email, 'password': password }
+        )
+        return jsonify(msg='SIGNED_UP')
 
 @router.get('/images/<img_name>')
 def return_image(img_name):

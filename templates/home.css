@@ -52,7 +52,7 @@ body {
     left: 0;
     width: 0;
     height: 2px;
-    background-color: rgb(78, 156, 233);
+    background-color: rgb(63, 134, 204);
     transition: 0.4s;
 }
 
@@ -107,8 +107,9 @@ header {
     display: flex;
     justify-content: right;
     text-align: center;
-    align-items: center;
+    align-items: flex-start;
     
+    margin-top: 16px;
     margin-right: 20px;
     
     height: 6vh;
@@ -119,10 +120,12 @@ header {
 .header-buttons {
     border: none;
     outline: none;
+    cursor: pointer;
 
     font-family: Urbanist;
 
-    width: 98px;
+    padding: 0 14px 0 14px;
+    min-width: 8em;
     height: 41px;
     margin-right: 13px;
 
@@ -144,4 +147,60 @@ header {
 
 #sign-up {
     margin-right: 7px;
+}
+
+/* dropdown */
+#dropdown-container {
+    flex-direction: column;
+    align-items: center;
+}
+
+#dropdown-button {
+    min-width: 15rem;
+    min-height: 3.1rem;
+    font-size: 1rem;
+}
+
+#dropdown {
+    display: flex;
+    flex-direction: column;
+
+    margin-right: 13px;
+    border-radius: 3px;
+    background-color: rgb(38, 112, 158);
+    color: white;
+
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition: 0.1s ease-in;
+}
+
+#dropdown a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    width: 14.7rem;
+    height: 3rem;
+
+    font-family: Urbanist;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: black;
+    
+    transition: 200ms ease-in-out;
+}
+
+#dropdown > a:hover {
+    background-color: rgb(32, 135, 182);
+    transform: perspective(120px)  translateZ(2px);
+    box-shadow: 2px 2px 4px 1px rgb(2, 7, 17);
+    border-radius: 3px;
+}
+
+#dropdown-container.active > #dropdown {
+    opacity: 1;
+    transform: translateY(3px);
+    pointer-events: all;
 }
