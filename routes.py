@@ -85,17 +85,8 @@ def home_redirect():
 
 @router.route('/home')
 def home():
-    user = request.cookies.get('user_id')
-    
-    if len(session) > 1 and session['user_id'] == user: # check if there is a user id in their session and if there is check if it matches with the one in their cookies
-        try:
-            db_user = url_db.users.find({ 'user_id': user })[0]['email'] # if it matches, find the user and get the email
-        except IndexError: # if the user is not found, delete their cookie and send an "unauthorized" http response
-            res = make_response({ "msg": "Unauthorized" }, 401)
-            res.delete_cookie('user_id')
-            del session['user_id']
-            return res
-
+    if len(session) > 1: # check if there is a user id in their session
+        db_user = url_db.users.find({ 'user_id': session['user_id'] })[0]['username'] # if it matches, find the user and get the email
         return render_template('home.html', domain=os.getenv('DOMAIN'), port=os.getenv('PORT'), user=db_user) # pass in the email when rendering template
     else:
         return render_template('home.html', domain=os.getenv('DOMAIN'), port=os.getenv('PORT'))
@@ -212,8 +203,7 @@ def url_shorten():
 @router.route('/sign_in', methods=['GET', 'POST'])
 def sign_in():
     if request.method == 'GET':
-        user = request.cookies.get('user_id') # if they are already signed in, redirect them back to home
-        if len(session) > 1 and user and session['user_id'] == user:
+        if len(session) > 1: # if they are already signed in, redirect them back to home
             return redirect('/home')
         return render_template('sign_in.html')
     else:
@@ -225,10 +215,8 @@ def sign_in():
         email_check = url_db.users.find({ 'email': email }) # check if email exists
         for user in email_check: 
             if user['password'] == encrypted_password: # check if password matches email (if it exists)
-                res = make_response({ 'msg': 'LOGGED_IN' }) # make a response
-                res.set_cookie(key='user_id', value=user['user_id'], max_age=604800, secure=True, httponly=True) # add cookie with user id
-                session['user_id'] = user['user_id'] # add user id to their session so they cant edit their cookie and go to someone else's account
-                return res
+                session['user_id'] = user['user_id'] # add user id to their session
+                return jsonify(msg='LOGGED_IN')
             else:
                 return jsonify(msg='INVALID_PASSWORD')
 
@@ -237,35 +225,54 @@ def sign_in():
 
 @router.get('/logout')
 def logout():
-    user = request.cookies.get('user_id') # check if they are signed in
-    if len(session) > 1 and user and session['user_id'] == user:
-        res = make_response(redirect('/home'))
-        res.delete_cookie('user_id') # deleting their cookie
+    if len(session) > 1: # check if they are signed in
         del session['user_id']
-        return res
     return redirect('/home')
 
 getLastDBUserId()
 @router.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'GET':
-        user = request.cookies.get('user_id') # if they are already signed in, redirect them back to home
-        if len(session) > 1 and user and session['user_id'] == user:
+        if len(session) > 1: # if they are already signed in, redirect them back to home
             return redirect('/home')
         return render_template('sign_up.html')
     else:
         data = request.data.decode()
         data = json.loads(data)
         email = data['email']
+        username = data['username']
+        username_check = url_db.users.find({ 'username': username }) # check if email exists
+        for user in username_check:
+            return jsonify(msg='EXISTING_USERNAME')
         email_check = url_db.users.find({ 'email': email }) # check if email exists
         for user in email_check:
             return jsonify(msg='EXISTING_EMAIL')
         password = data['password']
         last_user_id['user_id'] = str(int(last_user_id['user_id'])+1) # add on to the previous user id
         url_db.users.insert_one(
-            { 'user_id': last_user_id['user_id'], 'email': email, 'password': password }
+            { 'user_id': last_user_id['user_id'], 'username': username, 'email': email, 'password': password }
         )
         return jsonify(msg='SIGNED_UP')
+
+
+
+
+@router.route('/settings', methods=['GET', 'POST'])
+def settings():
+    if request.method == 'GET':
+        return render_template('settings.html')
+    else:
+        return jsonify(msg='received')
+
+@router.route('/mylinks', methods=['GET', 'POST'])
+def mylinks():
+    if request.method == 'GET':
+        return render_template('mylinks.html')
+    else:
+        return jsonify(msg='received')
+
+
+
 
 @router.get('/images/<img_name>')
 def return_image(img_name):
