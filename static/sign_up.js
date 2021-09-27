@@ -123,6 +123,34 @@ window.addEventListener("load", function () {
                         clearInterval(usernameInterval)
                     }
                 }, 100);
+            } else if(resp.msg === 'INVALID_EMAIL') {
+                sign_up_form.reset()
+                old_email = email.value
+                email.style.border = '1px solid red'
+                email_warning.style.display = 'block'
+                email_warning.innerHTML = 'Please enter a valid email..'
+                const emailInterval = setInterval(() => {
+                    if(email.value != old_email) {
+                        email.style.border = 'none'
+                        email_warning.style.display = 'none'
+                        email_warning.innerHTML = ''
+                        clearInterval(emailInterval)
+                    }
+                }, 100);
+            } else if(resp.msg === 'INVALID_USERNAME') {
+                sign_up_form.reset()
+                old_username = username.value
+                username.style.border = '1px solid red'
+                username_warning.style.display = 'block'
+                username_warning.innerHTML = 'Please enter a valid username.'
+                const usernameInterval = setInterval(() => {
+                    if(username.value != old_username) {
+                        username.style.border = 'none'
+                        username_warning.style.display = 'none'
+                        username_warning.innerHTML = ''
+                        clearInterval(usernameInterval)
+                    }
+                }, 100);
             } else if(resp.msg === 'SIGNED_UP') {
                 const signinXHR = new XMLHttpRequest()
                 signinXHR.addEventListener('load', (event) => {

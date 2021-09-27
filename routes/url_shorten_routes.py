@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, redirect, request, jsonify, send_file, abort, session, make_response
-from flask.helpers import url_for
+__name__ = 'routes' # have to change the name for some reason otherwise it wont import
+
+from flask import Blueprint, render_template, redirect, request, jsonify
 import pymongo, certifi, os
 import json
 import hashlib, random
@@ -8,7 +9,7 @@ import threading, time, datetime
 
 MONGO_DB_URI = os.getenv('MONGO_DB_URI')
 PROJ_PATH = os.getenv('PROJ_PATH')
-client = pymongo.MongoClient(MONGO_DB_URI, tlsCAFile=certifi.where(), connect=True)  # you could also use sql db for this
+client = pymongo.MongoClient(MONGO_DB_URI, tlsCAFile=certifi.where())  # you could also use sql db for this
 url_db = client.url_shortener  # url_shortener is collection name, contains the short link and main link, also contains user signin information (userid, username, password)
 requests = {}  # record all ip addresses and # of requests from each and the time they got ratelimted (to see how much longer their ratelimit will last)
 last_user_id = {'user_id': '1000000000'}
@@ -71,28 +72,11 @@ def short_link(link, char_length=7):
     
     return new_link[bound:bound+char_length]
 
-def getLastDBUserId(): # store the last user_id from the db in memory and every time a new acct is created, increment by 1
-    last_user = url_db.users.find({}).sort("user_id", pymongo.DESCENDING).limit(1)
-    for x in last_user:
-        last_user_id['user_id'] = x['user_id']
 
-router = Blueprint(__name__, 'routes')
-
-@router.route('/')
-def home_redirect():
-    return redirect('/home')
+url_shorten_router = Blueprint(__name__, 'routes')
 
 
-@router.route('/home')
-def home():
-    if len(session) > 1: # check if there is a user id in their session
-        db_user = url_db.users.find({ 'user_id': session['user_id'] })[0]['username'] # if it matches, find the user and get the email
-        return render_template('home.html', domain=os.getenv('DOMAIN'), port=os.getenv('PORT'), user=db_user) # pass in the email when rendering template
-    else:
-        return render_template('home.html', domain=os.getenv('DOMAIN'), port=os.getenv('PORT'))
-
-
-@router.route('/<short_link>')
+@url_shorten_router.route('/<short_link>')
 def existing_link(short_link):
     redirect_url = url_db.urls.find({'short_link': short_link})
     for x in redirect_url:
@@ -100,7 +84,7 @@ def existing_link(short_link):
     return render_template('404.html')
 
 
-@router.post('/url_shorten')
+@url_shorten_router.post('/url_shorten')
 def url_shorten():
     link_size = 7  # the number of characters at the end of the link example.com/thisstuff
     data = request.data.decode()  # request data, the link they want to shorten
@@ -146,8 +130,8 @@ def url_shorten():
             setTimeout(time_to_endofday(), clearRateLimit)
             return jsonify(error=True, msg=f'Youv\'e been ratelimited because you sent too many requests, try again after {round(requests[ip_addr]["ratelimit_off_time"] - time.time(), 1)} seconds')
 
-    link_regex_1 = '(?!www\.)[a-zA-Z0-9._]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # google.com
-    link_regex_2 = '(www\.)[a-zA-Z0-9._]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # www.google.com
+    link_regex_1 = r'(?!www\.)[a-zA-Z0-9._]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # google.com
+    link_regex_2 = r'(www\.)[a-zA-Z0-9._]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # www.google.com
     
     if re.match(link_regex_1, link) or re.match(link_regex_2, link):
         link = 'https://' + link
@@ -198,99 +182,3 @@ def url_shorten():
         { 'link': link, 'short_link': short_url }
     )
     return jsonify(short_link=short_url)
-
-
-@router.route('/sign_in', methods=['GET', 'POST'])
-def sign_in():
-    if request.method == 'GET':
-        if len(session) > 1: # if they are already signed in, redirect them back to home
-            return redirect('/home')
-        return render_template('sign_in.html')
-    else:
-        data = request.data.decode()
-        data = json.loads(data)
-        email = data['email']
-        encrypted_password = data['password']
-
-        email_check = url_db.users.find({ 'email': email }) # check if email exists
-        for user in email_check: 
-            if user['password'] == encrypted_password: # check if password matches email (if it exists)
-                session['user_id'] = user['user_id'] # add user id to their session
-                return jsonify(msg='LOGGED_IN')
-            else:
-                return jsonify(msg='INVALID_PASSWORD')
-
-        return jsonify(msg='INVALID_EMAIL')
-
-
-@router.get('/logout')
-def logout():
-    if len(session) > 1: # check if they are signed in
-        del session['user_id']
-    return redirect('/home')
-
-getLastDBUserId()
-@router.route('/sign_up', methods=['GET', 'POST'])
-def sign_up():
-    if request.method == 'GET':
-        if len(session) > 1: # if they are already signed in, redirect them back to home
-            return redirect('/home')
-        return render_template('sign_up.html')
-    else:
-        data = request.data.decode()
-        data = json.loads(data)
-        email = data['email']
-        username = data['username']
-        username_check = url_db.users.find({ 'username': username }) # check if email exists
-        for user in username_check:
-            return jsonify(msg='EXISTING_USERNAME')
-        email_check = url_db.users.find({ 'email': email }) # check if email exists
-        for user in email_check:
-            return jsonify(msg='EXISTING_EMAIL')
-        password = data['password']
-        last_user_id['user_id'] = str(int(last_user_id['user_id'])+1) # add on to the previous user id
-        url_db.users.insert_one(
-            { 'user_id': last_user_id['user_id'], 'username': username, 'email': email, 'password': password }
-        )
-        return jsonify(msg='SIGNED_UP')
-
-
-
-
-@router.route('/settings', methods=['GET', 'POST'])
-def settings():
-    if request.method == 'GET':
-        return render_template('settings.html')
-    else:
-        return jsonify(msg='received')
-
-@router.route('/mylinks', methods=['GET', 'POST'])
-def mylinks():
-    if request.method == 'GET':
-        return render_template('mylinks.html')
-    else:
-        return jsonify(msg='received')
-
-
-
-
-@router.get('/images/<img_name>')
-def return_image(img_name):
-    img_dir_path = os.path.dirname(f'{PROJ_PATH}\\images')
-
-    for root, dirs, files in os.walk(img_dir_path):
-        for file in files: 
-            if file.endswith('.png') and img_name in file:
-                return send_file(f'{PROJ_PATH}\\images\\{file}')
-    return abort(404)
-
-
-@router.get('/templates/<stylesheet>')
-def return_stylesheet(stylesheet):
-    stylesheet_dir_path = os.path.dirname(f'{PROJ_PATH}\\templates')
-
-    for root, dirs, files in os.walk(stylesheet_dir_path):
-        for file in files: 
-            if file.endswith('.css') and stylesheet in file:
-                return send_file(f'{PROJ_PATH}\\templates\\{file}')
-    return abort(404)
