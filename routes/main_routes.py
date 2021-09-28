@@ -34,12 +34,12 @@ def return_image(img_name):
     return abort(404)
 
 
-@main_router.get('/templates/<stylesheet>')
+@main_router.get('/templates/stylesheets/<stylesheet>')
 def return_stylesheet(stylesheet):
-    stylesheet_dir_path = os.path.dirname(f'{PROJ_PATH}\\templates')
+    stylesheet_dir_path = os.path.dirname(f'{PROJ_PATH}\\templates\\stylesheets')
 
     for root, dirs, files in os.walk(stylesheet_dir_path):
         for file in files: 
             if file.endswith('.css') and stylesheet in file:
-                return send_file(f'{PROJ_PATH}\\templates\\{file}')
+                return send_file(f'{PROJ_PATH}\\templates\\stylesheets\\{file}')
     return abort(404)
