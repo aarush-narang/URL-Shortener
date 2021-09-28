@@ -1,11 +1,10 @@
 __name__ = 'main' # have to change the name for some reason otherwise it wont import
 
 from flask import Blueprint, render_template, redirect, send_file, abort, session
-import pymongo, certifi, os
+import os
+from routes import client
 
-MONGO_DB_URI = os.getenv('MONGO_DB_URI')
 PROJ_PATH = os.getenv('PROJ_PATH')
-client = pymongo.MongoClient(MONGO_DB_URI, tlsCAFile=certifi.where())  # you could also use sql db for this
 url_db = client.url_shortener  # url_shortener is collection name, contains the short link and main link, also contains user signin information (userid, username, password)
 
 main_router = Blueprint(__name__, 'routes')

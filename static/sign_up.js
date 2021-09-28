@@ -49,7 +49,6 @@ window.addEventListener("load", function () {
     const password = document.getElementById('password') // password input
     const verif_pass = document.getElementById('verify-password')  // verify password input
     const username = document.getElementById('username')
-    const returnhomebtn = document.getElementById('return-home')
     // warning messages
     const email_warning = document.getElementById('warning-message-email')
     const pass_warning = document.getElementById('warning-message-password')
@@ -60,8 +59,6 @@ window.addEventListener("load", function () {
     const show_pass = document.getElementById('pass-show')
     const verif_show_pass = document.getElementById('v-pass-show')
 
-    // return to home button
-    returnhomebtn.onclick = () => window.location = '/home'
     // setup events for click on the show password button
     show_pass.onclick = () => {
         if(password.type === 'password') {

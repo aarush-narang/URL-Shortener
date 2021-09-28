@@ -1,18 +1,14 @@
 __name__ = 'routes' # have to change the name for some reason otherwise it wont import
 
 from flask import Blueprint, render_template, redirect, request, jsonify
-import pymongo, certifi, os
 import json
 import hashlib, random
 import re
 import threading, time, datetime
+from routes import client 
 
-MONGO_DB_URI = os.getenv('MONGO_DB_URI')
-PROJ_PATH = os.getenv('PROJ_PATH')
-client = pymongo.MongoClient(MONGO_DB_URI, tlsCAFile=certifi.where())  # you could also use sql db for this
 url_db = client.url_shortener  # url_shortener is collection name, contains the short link and main link, also contains user signin information (userid, username, password)
 requests = {}  # record all ip addresses and # of requests from each and the time they got ratelimted (to see how much longer their ratelimit will last)
-last_user_id = {'user_id': '1000000000'}
 
 class setInterval:  # this is like the setInterval function in javascript
     def __init__(self,interval,action) :

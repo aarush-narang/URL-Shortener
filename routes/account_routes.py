@@ -2,12 +2,10 @@ __name__ = 'accounts' # have to change the name for some reason otherwise it won
 
 import re
 from flask import Blueprint, render_template, redirect, request, jsonify, session
-import pymongo, certifi, os
+import pymongo
 import json
+from routes import client 
 
-MONGO_DB_URI = os.getenv('MONGO_DB_URI')
-PROJ_PATH = os.getenv('PROJ_PATH')
-client = pymongo.MongoClient(MONGO_DB_URI, tlsCAFile=certifi.where())  # you could also use sql db for this
 url_db = client.url_shortener  # url_shortener is collection name, contains the short link and main link, also contains user signin information (userid, username, password)
 last_user_id = {'user_id': '1000000000', 'run?': False} # store the last user id and if the function below was run in cache
 
@@ -56,8 +54,8 @@ def sign_up():
             return redirect('/home')
         return render_template('sign_up.html')
     else:
-        if not last_user_id['run?']:
-            getLastDBUserId()
+        if not last_user_id['run?']: # check if this func has already run
+            getLastDBUserId() # if not, run it
             last_user_id['run?'] = True
 
         data = request.data.decode()

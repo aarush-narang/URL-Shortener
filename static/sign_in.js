@@ -6,7 +6,6 @@ window.addEventListener("load", function () {
     const email_warning = document.getElementById('warning-message-email')
     const pass_warning = document.getElementById('warning-message-password')
     const general_warning = document.getElementById('warning-message')
-    const returnhomebtn = document.getElementById('return-home')
     const show_pass = document.getElementById('pass-show')
 
     show_pass.onclick = () => {
@@ -19,7 +18,6 @@ window.addEventListener("load", function () {
         }
     }
 
-    returnhomebtn.onclick = () => window.location = '/home'
     
     function sendData() {
         const encrypted_pass = window.shajs('sha512').update(password.value).digest('hex')
