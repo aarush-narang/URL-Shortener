@@ -4,13 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="../templates/stylesheets/settings.css">
-    <script type="text/javascript" src="../static/main.js"></script>
+    <link rel="stylesheet" type="text/css" href="../templates/stylesheets/dropdown.css">
+    <script type="text/javascript" src="../static/header.js" user={{user}}></script>
+    <script type="text/javascript" src="../static/settings.js"></script>
     <title>Settings</title>
 </head>
 
 <body>
+    <!-- 
+        include:
+            make a settings page for username or changing email or password or deleting account, etc.
+     -->
     <header>
-        <button class="header-buttons" id='return-home'>Return To Home</button>
+        <div id='dropdown-container' data-dropdown>
+            <button id='dropdown-button' class='header-buttons' data-dropdown-button>{{user}}</button>
+            <div id='dropdown'>
+                <a href="/home">Return To Home</a>
+                <a href="/mylinks">My Links</a>
+                <a href="/logout">Log Out</a>
+            </div>
+        </div>
     </header>
     <div>
 

@@ -27,15 +27,16 @@ window.addEventListener("load", function () {
             if(resp.msg === 'INVALID_EMAIL' || resp.msg === 'INVALID_PASSWORD') {
                 sign_in_form.reset()
                 old_email = email.value
-                email.style.border = '1px solid red'
-                email_warning.style.display = 'block'
-                email_warning.innerHTML = 'Your email or password is incorrect.'
-                const emailInterval = setInterval(() => {
-                    if(email.value != old_email) {
-                        email.style.border = 'none'
-                        email_warning.style.display = 'none'
-                        email_warning.innerHTML = ''
-                        clearInterval(emailInterval)
+                old_password = password.value
+                email.style.border = password.style.border = '1px solid red'
+                email_warning.style.display = pass_warning.style.display = 'block'
+                email_warning.innerHTML = pass_warning.innerHTML = 'Your email or password is incorrect.'
+                const interval = setInterval(() => {
+                    if(email.value != old_email || password.value != old_password) {
+                        email.style.border = password.style.border = 'none'
+                        email_warning.style.display = pass_warning.style.display = 'none'
+                        email_warning.innerHTML = pass_warning.innerHTML = ''
+                        clearInterval(interval)
                     }
                 }, 100);
             } else if(resp.msg === 'LOGGED_IN') {
@@ -48,8 +49,8 @@ window.addEventListener("load", function () {
             return
         })
 
-        signinXHR.open('POST', '/sign_in')
-        signinXHR.setRequestHeader('X-CSRFToken', token[0].getAttribute('value'))
+        signinXHR.open('POST', '/sign_in') // open the request
+        signinXHR.setRequestHeader('X-CSRFToken', token[0].getAttribute('value')) // add header for csrf token
         signinXHR.send(JSON.stringify({ "email": email.value, "password": encrypted_pass }))
     }
     sign_in_form.addEventListener('submit', function (event) {

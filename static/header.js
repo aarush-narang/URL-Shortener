@@ -1,9 +1,9 @@
+const currentscript = document.currentScript
 function getHeader() {
-    if (script.getAttribute('user')) {
+    if (currentscript.getAttribute('user')) {
         const user_drop = document.getElementById('dropdown-container')
         user_drop.style.display = 'flex'
-        
-        // show dropdown with their email and dropdown includes "my links" and "logout"
+        // show dropdown
     } else {
         document.getElementById('sign-in').style.display = 'block'
         document.getElementById('sign-up').style.display = 'block'
@@ -12,9 +12,9 @@ function getHeader() {
 window.addEventListener("load", function () { 
     getHeader()
     const sign_in_btn = document.getElementById('sign-in') // sign-in/sign-up buttons
-    sign_in_btn.onclick = () => window.location = '/sign_in'
+    if(sign_in_btn) sign_in_btn.onclick = () => window.location = '/sign_in'
     const sign_up_btn = document.getElementById('sign-up')
-    sign_up_btn.onclick = () => window.location = '/sign_up'
+    if(sign_up_btn) sign_up_btn.onclick = () => window.location = '/sign_up'
 
     document.addEventListener('click', event => {
         const isDropdownButton = event.target.matches('[data-dropdown-button]')

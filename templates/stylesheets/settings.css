@@ -16,7 +16,6 @@ body {
 
 
 
-/* header buttons */
 header {
     display: flex;
     justify-content: right;
@@ -35,10 +34,11 @@ header {
     border: none;
     outline: none;
     cursor: pointer;
-    padding: 0 14px 0 14px;
 
     font-family: Urbanist;
 
+    padding: 0 14px 0 14px;
+    min-width: 8em;
     height: 41px;
     margin-right: 13px;
 

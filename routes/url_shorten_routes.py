@@ -1,10 +1,12 @@
 __name__ = 'routes' # have to change the name for some reason otherwise it wont import
 
-from flask import Blueprint, render_template, redirect, request, jsonify
+from flask import Blueprint, render_template, redirect, request, jsonify, session
 import json
 import hashlib, random
 import re
 import threading, time, datetime
+
+from flask.helpers import make_response
 from routes import client 
 
 url_db = client.url_shortener  # url_shortener is collection name, contains the short link and main link, also contains user signin information (userid, username, password)
@@ -130,7 +132,7 @@ def url_shorten():
     link_regex_2 = r'(www\.)[a-zA-Z0-9._]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # www.google.com
     
     if re.match(link_regex_1, link) or re.match(link_regex_2, link):
-        link = 'https://' + link
+        link = 'http://' + link
     
 
     # check if domain/link is banned
@@ -145,34 +147,75 @@ def url_shorten():
         if specific_link == link:
             return jsonify(error=True, msg='That link is banned.')
 
-
+    
     # check if link is already in db
-    link_check = url_db.urls.find({'link': link.lower() }) 
-    for link in link_check:
-        return jsonify(short_link=link['short_link'])
-        
+    link_check = url_db.urls.find({'link': link }) 
+    for db_link_full in link_check:
+        if len(session) > 1:
+            res = make_response(jsonify(short_link=db_link_full['short_link']))
+            links_cookie_check = request.cookies.get('links')
+            if not links_cookie_check:
+                res.set_cookie('links', json.dumps([{ 'link': link, 'shortlink': db_link_full['short_link']}]), 2592000)
+            else:
+                cookies = json.loads(links_cookie_check)
+                for obj in cookies:
+                    if obj['link'] == link:
+                        return res
+                cookies.append({ 'link': link, 'shortlink': db_link_full['short_link']})
+                res.delete_cookie('links')
+                res.set_cookie('links', json.dumps(cookies), 2592000)
+        return res
+
     # shorten the link
     short_url = short_link(link, link_size)  
 
     short_link_check = url_db.urls.find({'short_link': short_url})  # check if short link is already in db
-    for db_link in short_link_check:  # if link already in db
-        if link in db_link['link'] :  # check if the db link is the same they want
-            return jsonify(short_link=db_link['short_link'])  #  if so return that short link
+    for db_link_short in short_link_check:  # if link already in db
+        if link in db_link_short['link'] :  # check if the db link is the same they want
+            if len(session) > 1:
+                res = make_response(jsonify(short_link=db_link_short['short_link'])) #  if so return that short link
+                links_cookie_check = request.cookies.get('links')
+                if not links_cookie_check:
+                    res.set_cookie('links', json.dumps([{ 'link': link, 'shortlink': db_link_short['short_link']}]), 2592000)
+                else:
+                    cookies = json.loads(links_cookie_check)
+                    for obj in cookies:
+                        if obj['link'] == link:
+                            return res
+                    cookies.append({ 'link': link, 'shortlink': db_link_short['short_link']})
+                    res.delete_cookie('links')
+                    res.set_cookie('links', json.dumps(cookies), 2592000)
+            return res
         else:
             while True:  # otherwise keep generating short links with 1 more character until it gets one not in the db
                 new_link = short_link(link, link_size+1)
                 link_check = url_db.urls.find({'short_link': new_link})
                 old_db_link = ''
-                for db_link in link_check:
-                    old_db_link = db_link
+                for db_link_short in link_check:
+                    old_db_link = db_link_short
                 if old_db_link == new_link:
                     continue
                 short_url = new_link
                 break
 
-    link_check = url_db.urls.find({'link': link}) # check if link is already in db
-    for link in link_check:
-        return jsonify(short_link=link['short_link'])
+    
+    if len(session) > 1:
+        url_db.urls.insert_one(
+            { 'link': link, 'short_link': short_url }
+        )
+        res = make_response(jsonify(short_link=short_url))
+        links_cookie_check = request.cookies.get('links')
+        if not links_cookie_check:
+            res.set_cookie('links', json.dumps([{ 'link': link, 'shortlink': short_url}]), 2592000)
+        else:
+            cookies = json.loads(links_cookie_check)
+            for obj in cookies:
+                if obj['link'] == link:
+                    return res
+            cookies.append({ 'link': link, 'shortlink':short_url})
+            res.delete_cookie('links')
+            res.set_cookie('links', json.dumps(cookies), 2592000)
+        return res
 
     url_db.urls.insert_one(
         { 'link': link, 'short_link': short_url }

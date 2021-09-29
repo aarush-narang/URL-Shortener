@@ -1,7 +1,7 @@
 __name__ = 'accounts' # have to change the name for some reason otherwise it wont import
 
 import re
-from flask import Blueprint, render_template, redirect, request, jsonify, session
+from flask import Blueprint, render_template, redirect, request, jsonify, session, make_response
 import pymongo
 import json
 from routes import client 
@@ -33,7 +33,7 @@ def sign_in():
         email_check = url_db.users.find({ 'email': email }) # check if email exists
         for user in email_check: 
             if user['password'] == encrypted_password: # check if password matches email (if it exists)
-                session['user_id'] = user['user_id'] # add user id to their session
+                session['user'] = { 'user_id': user['user_id'], 'username': user['username'], 'email': user['email'] } # add user id to their session
                 return jsonify(msg='LOGGED_IN')
             else:
                 return jsonify(msg='INVALID_PASSWORD')
@@ -44,7 +44,7 @@ def sign_in():
 @account_router.get('/logout')
 def logout():
     if len(session) > 1: # check if they are signed in
-        del session['user_id']
+        del session['user']
     return redirect('/home')
 
 @account_router.route('/sign_up', methods=['GET', 'POST'])
@@ -64,11 +64,11 @@ def sign_up():
         username = data['username']
         # check username and email with regex again
         username_regex = r'^[a-zA-Z0-9]{1,20}$'
-        email_regex = r'^(?! )(?=(.*[a-z]){3,})(?=(.*[A-Z]){2,})(?=(.*[0-9]){2,})(?=(.*[!@#$%^&*()\-__+.]){1,}).{8,}(?<! )$'
+        email_regex = r'^(([^<>()\[\]\\.,;:\s@\"]+(\.[^<>()\[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
         if not re.match(username_regex, username):
             return jsonify(msg='INVALID_USERNAME')
 
-        if not re.match(email_regex, username):
+        if not re.match(email_regex, email):
             return jsonify(msg='INVALID_EMAIL')
 
         # if both pass the regex, check if the username or email already exist
@@ -86,16 +86,19 @@ def sign_up():
         return jsonify(msg='SIGNED_UP')
 
 
-@account_router.route('/settings', methods=['GET', 'POST'])
+@account_router.get('/settings')
 def settings():
-    if request.method == 'GET':
-        return render_template('settings.html')
-    else:
-        return jsonify(msg='received')
+    return render_template('settings.html', user=session['user']['username'])
 
-@account_router.route('/mylinks', methods=['GET', 'POST'])
-def mylinks():
-    if request.method == 'GET':
-        return render_template('mylinks.html')
-    else:
-        return jsonify(msg='received')
+    
+@account_router.get('/mylinks')
+def myLinks():
+    return render_template('mylinks.html', user=session['user']['username'])
+
+@account_router.get('/links')
+def getLinks():
+    cookies = request.cookies
+    if not cookies.get('links'):
+        return jsonify(links='NO_LINKS')
+    links = json.loads(cookies.get('links'))
+    return jsonify(links=links)

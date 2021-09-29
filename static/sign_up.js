@@ -175,7 +175,7 @@ window.addEventListener("load", function () {
     // when the form is submitted go through these checks
     sign_up_form.addEventListener('submit', function (event) {
         event.preventDefault()
-        const email_regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        const email_regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/g
         const password_regex = /^(?! )(?=(.*[a-z]){3,})(?=(.*[A-Z]){2,})(?=(.*[0-9]){2,})(?=(.*[!@#$%^&*()\-__+.]){1,}).{8,}(?<! )$/
         const username_regex = /^[a-zA-Z0-9]{1,20}$/
 
@@ -193,7 +193,7 @@ window.addEventListener("load", function () {
                 }
             }, 100);
         }
-        else if(!email_regex.test(email.value)) { // checks for valid email
+        else if(!email.value.match(email_regex)) { // checks for valid email
             old_email = email.value
             email.style.border = '1px solid red'
             email_warning.style.display = 'block'
