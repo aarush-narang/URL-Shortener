@@ -1,5 +1,6 @@
 __name__ = 'routes' # have to change the name for some reason otherwise it wont import
 
+import os
 from flask import Blueprint, render_template, redirect, request, jsonify, session
 import json
 import hashlib, random
@@ -11,6 +12,7 @@ from routes import client
 
 url_db = client.url_shortener  # url_shortener is collection name, contains the short link and main link, also contains user signin information (userid, username, password)
 requests = {}  # record all ip addresses and # of requests from each and the time they got ratelimted (to see how much longer their ratelimit will last)
+DOMAIN = f'https://{os.getenv("DOMAIN")}:{os.getenv("PORT")}/'
 
 class setInterval:  # this is like the setInterval function in javascript
     def __init__(self,interval,action) :
@@ -147,24 +149,27 @@ def url_shorten():
         if specific_link == link:
             return jsonify(error=True, msg='That link is banned.')
 
-    
+    def insertLinkToUserDB(long_link, shortlink): # inserts link into their collection of stored links
+        if len(session) > 1:
+            user_urls = url_db.user_urls.find_one({ 'user_id': session['user']['user_id'] })
+            user_urls = list(dict(user_urls)['links'])
+            if len(user_urls) == 0:
+                user_urls.append({ 'link': long_link, 'shortlink': shortlink })
+                url_db.user_urls.update_one({ 'user_id': session['user']['user_id'] }, { '$set': { 'links': user_urls }  })
+            isInDb = False
+            for obj in user_urls:
+                if obj['link'] == long_link:
+                    isInDb = True
+                    break
+            if not isInDb:
+                user_urls.append({ 'link': long_link, 'shortlink': shortlink })
+                url_db.user_urls.update_one({ 'user_id': session['user']['user_id'] }, { '$set': { 'links': user_urls }  })
+
     # check if link is already in db
     link_check = url_db.urls.find({'link': link }) 
     for db_link_full in link_check:
-        if len(session) > 1:
-            res = make_response(jsonify(short_link=db_link_full['short_link']))
-            links_cookie_check = request.cookies.get('links')
-            if not links_cookie_check:
-                res.set_cookie('links', json.dumps([{ 'link': link, 'shortlink': db_link_full['short_link']}]), 2592000)
-            else:
-                cookies = json.loads(links_cookie_check)
-                for obj in cookies:
-                    if obj['link'] == link:
-                        return res
-                cookies.append({ 'link': link, 'shortlink': db_link_full['short_link']})
-                res.delete_cookie('links')
-                res.set_cookie('links', json.dumps(cookies), 2592000)
-        return res
+        insertLinkToUserDB(link, db_link_full['short_link'])
+        return jsonify(short_link=db_link_full['short_link'])
 
     # shorten the link
     short_url = short_link(link, link_size)  
@@ -172,20 +177,8 @@ def url_shorten():
     short_link_check = url_db.urls.find({'short_link': short_url})  # check if short link is already in db
     for db_link_short in short_link_check:  # if link already in db
         if link in db_link_short['link'] :  # check if the db link is the same they want
-            if len(session) > 1:
-                res = make_response(jsonify(short_link=db_link_short['short_link'])) #  if so return that short link
-                links_cookie_check = request.cookies.get('links')
-                if not links_cookie_check:
-                    res.set_cookie('links', json.dumps([{ 'link': link, 'shortlink': db_link_short['short_link']}]), 2592000)
-                else:
-                    cookies = json.loads(links_cookie_check)
-                    for obj in cookies:
-                        if obj['link'] == link:
-                            return res
-                    cookies.append({ 'link': link, 'shortlink': db_link_short['short_link']})
-                    res.delete_cookie('links')
-                    res.set_cookie('links', json.dumps(cookies), 2592000)
-            return res
+            insertLinkToUserDB(link, db_link_short['short_link'])
+            return jsonify(short_link=db_link_short['short_link'])
         else:
             while True:  # otherwise keep generating short links with 1 more character until it gets one not in the db
                 new_link = short_link(link, link_size+1)
@@ -199,23 +192,7 @@ def url_shorten():
                 break
 
     
-    if len(session) > 1:
-        url_db.urls.insert_one(
-            { 'link': link, 'short_link': short_url }
-        )
-        res = make_response(jsonify(short_link=short_url))
-        links_cookie_check = request.cookies.get('links')
-        if not links_cookie_check:
-            res.set_cookie('links', json.dumps([{ 'link': link, 'shortlink': short_url}]), 2592000)
-        else:
-            cookies = json.loads(links_cookie_check)
-            for obj in cookies:
-                if obj['link'] == link:
-                    return res
-            cookies.append({ 'link': link, 'shortlink':short_url})
-            res.delete_cookie('links')
-            res.set_cookie('links', json.dumps(cookies), 2592000)
-        return res
+    insertLinkToUserDB(link, short_url)
 
     url_db.urls.insert_one(
         { 'link': link, 'short_link': short_url }

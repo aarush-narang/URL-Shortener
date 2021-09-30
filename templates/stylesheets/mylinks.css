@@ -14,18 +14,16 @@ body {
     align-items: center;
 }
 
-
-
 /* header buttons */
 header {
     display: flex;
     justify-content: right;
     text-align: center;
     align-items: flex-start;
-    
+
     margin-top: 16px;
     margin-right: 20px;
-    
+
     height: 6vh;
     min-height: 55px;
     width: 100%;
@@ -68,6 +66,7 @@ header {
 
     padding-top: 30px;
 }
+
 .link-container-back {
     display: flex;
     flex-direction: column;
@@ -75,7 +74,7 @@ header {
     justify-content: center;
 
     width: 70%;
-    min-width: 200px;
+    min-width: 290px;
     max-width: 900px;
     height: 7.3vh;
     min-height: 60px;
@@ -87,6 +86,7 @@ header {
     margin-bottom: 8px;
     padding: 3px 5px 3px 5px;
 }
+
 .link-container-front {
     display: flex;
     flex-direction: row;
@@ -94,7 +94,7 @@ header {
     justify-content: center;
 
     width: 98.3%;
-    min-width: 150px;
+    min-width: 240px;
     max-width: 890px;
     height: 6vh;
     min-height: 48px;
@@ -105,45 +105,139 @@ header {
 
 }
 
-@media screen and (min-width: 601px) { /* font size based on screen size */
+#settings-btn {
+    border: none;
+    outline: none;
+
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+
+    background-color: rgb(0, 51, 80);
+    color: rgb(156, 219, 248);
+    transition: background-color 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+
+    cursor: pointer;
+}
+
+@media screen and (min-width: 760px) {
+    /* font size based on screen size */
+    .link-container-back {
+        width: 90%;
+        min-width: 720px;
+        max-width: 900px;
+        height: 7.3vh;
+        min-height: 60px;
+        max-height: 80px;
+    }
+    .link-container-front {
+        width: 98.3%;
+        min-width: 210px;
+        max-width: 890px;
+        height: 6vh;
+        min-height: 48px;
+        max-height: 72px;
+    }
     .links-container {
         display: flex;
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
-        
+        margin: 0 5px 0 15px;
         width: 95%;
-    }  
-    .links-container * {
-        font-size: 120%;
+    }
+    .links-container a {
+        font-size: 100%;
         font-family: Urbanist;
         color: rgb(0, 0, 0);
     }
+    /* copy button */
+    #copy-btn {
+        cursor: pointer;
+        outline: none;
+        border: none;
+        font-family: Urbanist;
+        font-size: 90%;
+
+        margin: 0 7px 0 0;
+       
+        width: 100px;
+        height: 4vh;
+        min-height: 35px;
+        max-height: 45px;
+        border-radius: 5px;
+        background-color: rgb(0, 51, 80);
+        color: rgb(156, 219, 248);
+        transition: background-color 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+    }
+    #settings-btn {
+        
+    }
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 760px) {
     .links-container {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        width: 80%;
+        align-items: flex-start;
+        margin: 0 10px 0 10px;
+        width: 95%;
     }
-    .links-container * {
-        font-size: 70%;
+    .links-container a {
+        font-size: 60%;
         font-family: Urbanist;
         color: rgb(0, 0, 0);
     }
     #llink {
         padding-bottom: 10px;
+    } 
+    /* copy button */
+    #copy-btn {
+        cursor: pointer;
+        outline: none;
+        border: none;
+        font-family: Urbanist;
+        font-size: 60%;
+        
+        margin: 0 5px 0 0px;
+        width: 15vw;
+        min-width: 60px;
+        height: 30px;
+
+        border-radius: 5px;
+
+        background-color: rgb(0, 51, 80);
+        color: rgb(156, 219, 248); 
+
+        transition: background-color 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+
+    }
+    #settings-btn {
+        
     }
 }
 
-.links-container * {
-    transition: color 200ms ease-in;
+#copy-btn:hover, #settings-btn:hover {
+    background-color: rgb(4, 78, 121);
+}
+#copy-btn:active, #settings-btn:active {
+    background-color: rgb(11, 69, 102);
+}
 
+.links-container a {
+    transition: color 200ms ease-in;
+    padding-right: 8px;
     text-decoration: underline;
     cursor: pointer;
 }
-.links-container *:hover {
+
+.links-container a:hover {
     color: rgb(177, 216, 255);
+}
+
+#btns-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-right: 7px;
 }
