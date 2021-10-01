@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="../templates/stylesheets/sign_in.css">
+    <link rel="stylesheet" type="text/css" href="../templates/stylesheets/header.css">
     <script type="text/javascript" src="../static/sign_in.js"></script>
     <script type="text/javascript" src="../static/main.js"></script>
     <script type="text/javascript" src="../static/bundle.js"></script>
@@ -12,7 +13,7 @@
 
 <body>
     <header>
-        <button onclick="window.location='/home'" class="header-buttons" id='return-home'>Return To Home</button>
+        <button onclick="window.location='/home'" class="header-buttons">Return To Home</button>
     </header>
     <div class="form-container">
         <form autocomplete="off" spellcheck="false" id='sign-in-form'>
@@ -39,6 +40,9 @@
             </div>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="submit" id='sign-in-submit' value="Sign In"></input>
+            <div id="sign-up-message-container">
+                <p id='sign-up-text'>Dont have an account? <a href="/sign_up">Sign Up</a></p>
+            </div>
             <div class="warning-message-container">
                 <p id="warning-message"></p>
             </div>

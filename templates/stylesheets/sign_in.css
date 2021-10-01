@@ -139,44 +139,18 @@ body {
     margin-top: 2px;
 }
 
-/* header buttons */
-header {
+/* text below submit button */
+#sign-up-message-container {
     display: flex;
-    justify-content: right;
-    text-align: center;
-    align-items: flex-start;
-    
-    margin-top: 16px;
-    margin-right: 20px;
-    
-    height: 6vh;
-    min-height: 55px;
-    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
 }
-
-.header-buttons {
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 0 14px 0 14px;
-
+#sign-up-text {
+    font-size: 8pt;
     font-family: Urbanist;
-
-    height: 41px;
-    margin-right: 13px;
-
-    border-radius: 4px;
-
-    color: rgb(199, 227, 255);
-    background-color: rgb(18, 90, 131);
-
-    transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+    color: white;
 }
-
-.header-buttons:hover {
-    background-color: rgb(0, 65, 102);
-}
-
-.header-buttons:active {
-    background-color: rgb(0, 76, 121);
+#sign-up-text a {
+    color: wheat;
 }

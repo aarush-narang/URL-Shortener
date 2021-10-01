@@ -22,7 +22,7 @@ window.addEventListener("load", function () {
         warning_message.innerHTML = respMsg
 
         const warning_interval = setInterval(() => {
-            if(input.value != old_value) {
+            if(input.value != old_value && !input.value.includes(domain)) {
                 input.style.border = 'none'
                 warning_message.innerHTML = ''
                 clearInterval(warning_interval)
@@ -53,7 +53,12 @@ window.addEventListener("load", function () {
             resp = JSON.parse(event.target.responseText)
 
             if (resp.error) { // check if the person is ratelimited
-                return warn(resp.msg)
+                if(resp.type === 'RATELIMITED') {
+                    return warn(resp.msg)
+                } else if(resp.type === 'LIMIT_REACHED') {
+                    warn(resp.msg)
+                }
+                
             }
             input.value = `${domain}${resp.short_link}` // otherwise edit the input value to show the new shortened link
             check_input_value(`${domain}${resp.short_link}`) // create an interval to check if the input is changed

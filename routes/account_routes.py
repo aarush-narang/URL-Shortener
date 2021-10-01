@@ -99,8 +99,19 @@ def settings():
 def myLinks():
     return render_template('mylinks.html', user=session['user']['username'], domain=os.getenv('DOMAIN'), port=os.getenv('PORT'))
 
-@account_router.get('/links')
+@account_router.get('/getlinks')
 def getLinks():
     user = url_db.user_urls.find_one({ 'user_id': session['user']['user_id'] })
     user_urls = dict(user)['links']
     return jsonify(links=user_urls)
+
+@account_router.delete('/deletelink')
+def deletelink():
+    data = json.loads(request.data.decode())
+    user = url_db.user_urls.find_one({ 'user_id': session['user']['user_id'] })
+    user_links = dict(user)['links']
+    for obj in user_links:
+        if obj['link'] == data['link'] and obj['shortlink'] == data['shortlink']:
+            user_links.remove(obj)
+            url_db.user_urls.update_one({ 'user_id': session['user']['user_id'] }, { '$set': { 'links': user_links }  })
+    return jsonify(msg='REMOVED_LINK')

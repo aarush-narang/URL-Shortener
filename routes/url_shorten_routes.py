@@ -109,26 +109,32 @@ def url_shorten():
     startInterval(60, clearMinuteNumbers)
     startInterval(86400, clearDayNumbers)
 
+    if len(session) > 1:
+        max_reqs_min = 100
+        max_reqs_day = 1500
+    else:
+        max_reqs_min = 20
+        max_reqs_day = 400
 
     if ip_addr not in requests:  # if the ip is new, add it
         requests[ip_addr] = { 'last_minute': 1, 'last_day': 1, 'ratelimited': False, 'ratelimit_off_time': None }
     elif requests[ip_addr]['ratelimited']:  # if ip is ratelimited, restrict them from making more requests
-        return jsonify(error=True, msg=f'Youv\'e been ratelimited because you sent too many requests, try again after {round(requests[ip_addr]["ratelimit_off_time"] - time.time(), 1)} seconds')
+        return jsonify(error=True, type='RATELIMITED', msg=f'Youv\'e been ratelimited because you sent too many requests, try again later.') # after {round(requests[ip_addr]["ratelimit_off_time"] - time.time(), 1)} seconds
     else:  # otherwise, increment their request count and then check if they exceed their limit of requests
         requests[ip_addr]['last_minute'] += 1
         requests[ip_addr]['last_day'] += 1
-        if requests[ip_addr]['last_minute'] >= 1000:  # if the ip exceeds the max number of requests, restrict them from making more requests
+        if requests[ip_addr]['last_minute'] > max_reqs_min:  # if the ip exceeds the max number of requests, restrict them from making more requests
             requests[ip_addr]['ratelimited'] = True
             requests[ip_addr]['last_minute'] = 0
             requests[ip_addr]['ratelimit_off_time'] = time.time() + 600
             setTimeout(600, clearRateLimit)
-            return jsonify(error=True, msg=f'Youv\'e been ratelimited because you sent too many requests, try again after {round(requests[ip_addr]["ratelimit_off_time"] - time.time(), 1)} seconds')
-        if requests[ip_addr]['last_day'] >= 10000:  # if the ip exceeds the max number of requests, restrict them from making more requests
+            return jsonify(error=True, type='RATELIMITED', msg=f'Youv\'e been ratelimited because you sent too many requests, try again later.') # after {round(requests[ip_addr]["ratelimit_off_time"] - time.time(), 1)} seconds
+        if requests[ip_addr]['last_day'] > max_reqs_day:  # if the ip exceeds the max number of requests, restrict them from making more requests
             requests[ip_addr]['ratelimited'] = True
             requests[ip_addr]['last_day'] = 0
             requests[ip_addr]['ratelimit_off_time'] = time.time() + time_to_endofday()
             setTimeout(time_to_endofday(), clearRateLimit)
-            return jsonify(error=True, msg=f'Youv\'e been ratelimited because you sent too many requests, try again after {round(requests[ip_addr]["ratelimit_off_time"] - time.time(), 1)} seconds')
+            return jsonify(error=True, type='RATELIMITED', msg=f'Youv\'e been ratelimited because you sent too many requests, try again later.') # after {round(requests[ip_addr]["ratelimit_off_time"] - time.time(), 1)} seconds
 
     link_regex_1 = r'(?!www\.)[a-zA-Z0-9._]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # google.com
     link_regex_2 = r'(www\.)[a-zA-Z0-9._]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9._]*)'  # www.google.com
@@ -153,6 +159,8 @@ def url_shorten():
         if len(session) > 1:
             user_urls = url_db.user_urls.find_one({ 'user_id': session['user']['user_id'] })
             user_urls = list(dict(user_urls)['links'])
+            if len(user_urls) == 200:
+                return 'LIMIT_REACHED'
             if len(user_urls) == 0:
                 user_urls.append({ 'link': long_link, 'shortlink': shortlink })
                 url_db.user_urls.update_one({ 'user_id': session['user']['user_id'] }, { '$set': { 'links': user_urls }  })
@@ -168,7 +176,9 @@ def url_shorten():
     # check if link is already in db
     link_check = url_db.urls.find({'link': link }) 
     for db_link_full in link_check:
-        insertLinkToUserDB(link, db_link_full['short_link'])
+        res = insertLinkToUserDB(link, db_link_full['short_link'])
+        if res == 'LIMIT_REACHED':
+            return jsonify(short_link=db_link_full['short_link'], error=True, type='LIMIT_REACHED', msg='Oops! Youv\'e reached your limit for storing links, delete some links to be able to store more!')
         return jsonify(short_link=db_link_full['short_link'])
 
     # shorten the link
@@ -177,7 +187,9 @@ def url_shorten():
     short_link_check = url_db.urls.find({'short_link': short_url})  # check if short link is already in db
     for db_link_short in short_link_check:  # if link already in db
         if link in db_link_short['link'] :  # check if the db link is the same they want
-            insertLinkToUserDB(link, db_link_short['short_link'])
+            res = insertLinkToUserDB(link, db_link_short['short_link'])
+            if res == 'LIMIT_REACHED':
+                return jsonify(short_link=db_link_short['short_link'], error=True, type='LIMIT_REACHED', msg='Oops! Youv\'e reached your limit for storing links, delete some links to be able to store more!')
             return jsonify(short_link=db_link_short['short_link'])
         else:
             while True:  # otherwise keep generating short links with 1 more character until it gets one not in the db
@@ -191,10 +203,10 @@ def url_shorten():
                 short_url = new_link
                 break
 
-    
-    insertLinkToUserDB(link, short_url)
-
     url_db.urls.insert_one(
         { 'link': link, 'short_link': short_url }
     )
+    res = insertLinkToUserDB(link, short_url)
+    if res == 'LIMIT_REACHED':
+        return jsonify(short_link=short_url, error=True, type='LIMIT_REACHED', msg='Oops! Youv\'e reached your limit for storing links, delete some links to be able to store more!')
     return jsonify(short_link=short_url)
