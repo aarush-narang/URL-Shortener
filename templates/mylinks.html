@@ -12,6 +12,22 @@
 </head>
 
 <body>
+    <template id="link-template">
+        <div class="link-container-back">
+            <div class="link-container-front">
+                <div class="links-container">
+                    <a class="llink"></a>
+                    <a class="slink"></a>
+                </div>
+                <div class="btns-container">
+                    <button class="copy-btn">Copy Link</button>
+                    <button class="delete-btn">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
     <header>
         <div id='dropdown-container' data-dropdown>
             <button id='dropdown-button' class='header-buttons' data-dropdown-button>{{user}}</button>
@@ -24,8 +40,12 @@
     </header>
     <div>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div id='total-links-container'><p id='total-links'></p></div>
-        <div id='container'></div>
+        <div id='total-links-container'>
+            <p id='total-links'></p>
+        </div>
+        <div id='container'>
+           
+        </div>
     </div>
 </body>
 

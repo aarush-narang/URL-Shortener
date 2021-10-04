@@ -14,47 +14,21 @@ window.addEventListener('load', function () {
         const port = script.getAttribute('port')
 
         const linkscontainer = document.getElementById('container')
-        const outerDiv = document.createElement('div')
-        const innerDiv = document.createElement('div')
-        const linkContainer = document.createElement('div')
-        const long_link = document.createElement('a')
-        const short_link = document.createElement('a')
+        const linkTemplate = document.querySelector('template')
 
-        const copy_btn = document.createElement('button')
-        const settings_btn = document.createElement('button')
-        const settings_icon = document.createElement('i')
+        const templatecontent = linkTemplate.content.cloneNode(true)
 
-        const btns_container = document.createElement('div')
-        btns_container.append(copy_btn, settings_btn)
+        const buttons = templatecontent.querySelectorAll('button')
+        const links = templatecontent.querySelectorAll('a')
+        
+        links[0].innerHTML = link.length < 28 ? link : link.slice(0, 29) + '...' // set the values for the long link
+        links[0].onclick = () => window.open(link)
+        
+        
+        links[1].innerHTML = `https://${domain}:${port}/${shortlink}` // set values for short link
+        links[1].onclick = () => window.open(shortlink)
 
-        btns_container.id = 'btns-container'
-
-        copy_btn.id = 'copy-btn'
-        copy_btn.innerHTML = 'Copy Link'
-
-        settings_btn.appendChild(settings_icon)
-        settings_btn.id = 'settings-btn'
-        settings_icon.className = 'fa fa-times'
-        settings_btn.title = `Delete https://${domain}:${port}/${shortlink}`
-
-        linkContainer.append(long_link, short_link)
-        innerDiv.append(linkContainer, btns_container)
-        outerDiv.appendChild(innerDiv)
-        linkscontainer.appendChild(outerDiv)
-
-        outerDiv.className = 'link-container-back'
-        innerDiv.className = 'link-container-front'
-        linkContainer.className = 'links-container'
-
-        long_link.innerHTML = link.length < 28 ? link : link.slice(0, 29) + '...'
-        long_link.onclick = () => window.open(link)
-        long_link.id = 'llink'
-
-        short_link.innerHTML = `https://${domain}:${port}/${shortlink}`
-        short_link.onclick = () => window.open(shortlink)
-        short_link.id = 'slink'
-
-        copy_btn.onclick = () => { // add modal or something that says copied
+        buttons[0].onclick = () => { // copy link button
             function clearSelect() {
                 if (window.getSelection) {
                     if (window.getSelection().empty) {
@@ -69,30 +43,34 @@ window.addEventListener('load', function () {
             clearSelect()
             if (document.selection) {
                 var range = document.body.createTextRange();
-                range.moveToElementText(short_link);
+                range.moveToElementText(links[1]);
                 range.select().createTextRange();
                 document.execCommand("copy");
             } else if (window.getSelection) {
                 var range = document.createRange();
-                range.selectNode(short_link);
+                range.selectNode(links[1]);
                 window.getSelection().addRange(range);
                 document.execCommand("copy");
             }
             clearSelect()
 
             // change color of button to show it was copied
-            copy_btn.style.backgroundColor = 'rgb(106, 222, 170)' 
-            copy_btn.innerHTML = 'Copied!'
-            copy_btn.style.color = 'black'
+            buttons[0].style.backgroundColor = 'rgb(106, 222, 170)' 
+            buttons[0].innerHTML = 'Copied!'
+            buttons[0].style.color = 'black'
             setTimeout(() => {
-                copy_btn.innerHTML = 'Copy Link'
-                copy_btn.style.backgroundColor = ''
-                copy_btn.style.color = ''
+                buttons[0].innerHTML = 'Copy Link'
+                buttons[0].style.backgroundColor = ''
+                buttons[0].style.color = ''
             }, 3000);
         }
-        settings_btn.onclick = () => {
+
+        buttons[1].title = `Delete https://${domain}:${port}/${shortlink}`; // delete link button
+        buttons[1].onclick = () => { // delete link button
             deletelink(link, shortlink)
         }
+
+        linkscontainer.appendChild(templatecontent)
     }
     function deletelink(link, shortlink) {
         const deletelinkXHR = new XMLHttpRequest()
