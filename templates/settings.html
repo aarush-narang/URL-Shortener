@@ -7,27 +7,65 @@
     <link rel="stylesheet" type="text/css" href="../templates/stylesheets/header.css">
     <script type="text/javascript" src="../static/header.js" user={{user}}></script>
     <script type="text/javascript" src="../static/settings.js"></script>
-    <title>Settings</title>
+    <title>{{user}} - Settings</title>
 </head>
 
 <body>
-    <!-- 
-        include:
-            make a settings page for username or changing email or password or deleting account, etc.
-     -->
     <header>
         <div id='dropdown-container' data-dropdown>
             <button id='dropdown-button' class='header-buttons' data-dropdown-button>{{user}}</button>
             <div id='dropdown'>
-                <a href="/home">Return To Home</a>
                 <a href="/mylinks">My Links</a>
-                <a href="/logout">Log Out</a>
+                <a href="/home">Return To Home</a>
+                <a style="color: rgb(166, 70, 70);" href="/logout">Log Out</a>
             </div>
         </div>
     </header>
-    <div>
-
+    <div id="settings-container">
+        <form id='settings-form' autocomplete="off" spellcheck="false">
+            <div class="form-setting">
+                <!-- username -->
+                <div class="input-container" id="username-container">
+                    <p>Change your username:</p>
+                    <a>Username: <input id="username-input" placeholder="johndoe"></a>
+                </div>
+            </div>
+            <div class="form-setting">
+                <!-- email -->
+                <div class="input-container" id="email-container">
+                    <p>Change your email:</p>
+                    <a>Email: <input id="email-input" placeholder="johndoe@gmail.com"></a>
+                </div>
+            </div>
+            <div class="form-setting" id='password'>
+                <!-- password -->
+                <div class="input-container" id="password-container">
+                    <p>Change your password:</p>
+                    <div class="pass-label-container">
+                        <a class="pass-container">Password:</a>
+                        <a id="show-pass-n" class="show-pass">show</a>
+                    </div>
+                    <input type="password" id="password-input">
+                    <div class="pass-label-container">
+                        <a class="pass-container">Verify Password:</a>
+                        <a id="show-pass-v" class="show-pass">show</a>
+                    </div>
+                    <input type="password" id="v-password-input">
+                </div>
+            </div>
+            <div class="form-setting">
+                <input id="settings-save" type="button" value="Save Changes">
+            </div>
+        </form>
     </div>
+    <footer>
+        <div class="form-setting" id='account-delete'>
+            <text>
+                <h1>Account Deletion</h1>
+                <p>CAUTION: This action is <b>irreversable</b></p>
+            </text>
+        </div>
+    </footer>
 </body>
 
 </html>

@@ -120,12 +120,10 @@ window.addEventListener('load', function () {
                     createLinkElement(element.link, element.shortlink)
                 });
             }
-            
         })
         linksXHR.addEventListener('error', function (resp) {
-            
+            console.log('error')
         })
-
         linksXHR.open('GET', '/getlinks')
         linksXHR.send()
     }

@@ -18,7 +18,6 @@ window.addEventListener("load", function () {
         }
     }
 
-    
     function sendData() {
         const encrypted_pass = window.shajs('sha512').update(password.value).digest('hex')
         const signinXHR = new XMLHttpRequest()

@@ -22,8 +22,8 @@ account_router = Blueprint(__name__, 'routes')
 @account_router.route('/sign_in', methods=['GET', 'POST'])
 def sign_in():
     if request.method == 'GET':
-        if len(session) > 1: # if they are already signed in, redirect them back to home
-            return redirect('/home')
+        if len(session) > 1: # if they are already signed in, dont show the page
+            return render_template('404.html')
         return render_template('sign_in.html')
     else:
         data = request.data.decode()
@@ -51,8 +51,8 @@ def logout():
 @account_router.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'GET':
-        if len(session) > 1: # if they are already signed in, redirect them back to home
-            return redirect('/home')
+        if len(session) > 1: # if they are already signed in, dont show the page
+            return render_template('404.html')
         return render_template('sign_up.html')
     else:
         if not last_user_id['run?']: # check if this func has already run
@@ -90,7 +90,7 @@ def sign_up():
         return jsonify(msg='SIGNED_UP')
 
 
-@account_router.get('/settings')
+@account_router.get('/settings') # change to .route instead of .get and add methods for get and post, use this route for updating settings
 def settings():
     return render_template('settings.html', user=session['user']['username'])
 

@@ -31,8 +31,4 @@ window.addEventListener("load", function () {
             dropdown.classList.remove('active')
         })
     })
-    
-    
-    
-    
 })

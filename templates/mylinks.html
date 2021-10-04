@@ -8,7 +8,7 @@
     <script type="text/javascript" src="../static/mylinks.js" domain={{domain}} port={{port}}></script>
     <script type="text/javascript" src="../static/header.js" user={{user}}></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>My Links</title>
+    <title>{{user}}'s Links</title>
 </head>
 
 <body>
@@ -16,9 +16,9 @@
         <div id='dropdown-container' data-dropdown>
             <button id='dropdown-button' class='header-buttons' data-dropdown-button>{{user}}</button>
             <div id='dropdown'>
-                <a href="/home">Return To Home</a>
                 <a href="/settings">Settings</a>
-                <a href="/logout">Log Out</a>
+                <a href="/home">Return To Home</a>
+                <a style="color: rgb(166, 70, 70);" href="/logout">Log Out</a>
             </div>
         </div>
     </header>

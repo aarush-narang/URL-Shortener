@@ -5,55 +5,153 @@
 body {
     background-color: rgb(6, 20, 29);
 }
-
-.form-container {
+/* settings */
+#settings-container {
     display: flex;
+    flex-direction: column;
     justify-content: center;
-    text-align: center;
-    min-height: 70vh;
+    align-items: center;
+
+    margin-top: 50px;
+
+    height: 70vh;
+    min-height: 500px;
+    min-width: 550px;
+}
+#settings-container > div, form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
 }
 
-
-
-header {
+.form-setting {
     display: flex;
-    justify-content: right;
-    text-align: center;
-    align-items: flex-start;
+    flex-direction: column;
     
-    margin-top: 16px;
-    margin-right: 20px;
+    align-items: center;
     
-    height: 6vh;
-    min-height: 55px;
-    width: 100%;
+    height: 14vh;
+    min-height: 130px;
+    max-height: 135px;
+    width: 65vw;
+    min-width: 400px;
+    max-width: 1100px;
+}
+#password {
+    height: 21vh;
+    min-height: 200px;
+    max-height: 210px;
+}
+.form-setting p {
+    font-size: 100%;
+    font-family: Urbanist;
+    color: lightblue;
+}
+.form-setting a {
+    font-size: 80%;
+    font-family: Urbanist;
+    color: lightblue;
+}
+.input-container {
+    width: 80%;
+}
+.input-container p {
+    font-weight: 600; 
+    text-decoration: underline;
 }
 
-.header-buttons {
+/* inputs */
+.form-setting input {
+    border: none;
+    outline: none;
+    width: 100%;
+
+    margin: 6px 0 7px 0;
+    padding: 10px;
+    border-radius: 5px;
+
+    background-color: rgba(15, 41, 56, 0.6);
+    color: paleturquoise;
+    font-family: Urbanist;
+    font-size: 13pt;
+
+    transition: background-color 200ms ease;
+}
+.form-setting input::placeholder {
+    color: paleturquoise;
+    opacity: 0.43;
+}
+.form-setting input:hover {
+    background-color: rgb(13, 37, 51);
+}
+.form-setting input:focus {
+    background-color: rgb(16, 43, 60);
+}
+/* password */
+.pass-label-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+}
+.show-pass {
+    text-decoration: underline;
+    cursor: pointer;
+
+    margin-right: -14px;
+}
+/* save settings button */
+#settings-save {
     border: none;
     outline: none;
     cursor: pointer;
 
+    width: 80%;
+    max-width: 910px;
+    min-width: 340px;
+
+    margin-left: 19px;
+    padding: 13px;
+    border-radius: 5px;
+
+    background-color: rgba(15, 41, 56, 0.8);
+    color: paleturquoise;
     font-family: Urbanist;
+    font-size: inherit;
 
-    padding: 0 14px 0 14px;
-    min-width: 8em;
-    height: 41px;
-    margin-right: 13px;
-
-    border-radius: 4px;
-
-    color: rgb(199, 227, 255);
-    background-color: rgb(18, 90, 131);
-
-    transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+    transition: background-color 200ms ease;
 }
 
-.header-buttons:hover {
-    background-color: rgb(0, 65, 102);
+#settings-save:hover {
+    background-color: rgb(16, 47, 65);
+}
+#settings-save:active {
+    background-color: rgb(16, 43, 60);
+}
+/* account deletion button */
+#account-delete {
+    background-color: rgb(13, 35, 48);
+    border: 1px solid rgb(40, 122, 151);
+    border-radius: 14px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+
+    font-family: Urbanist;
+    color: lightblue;
+    font-size: 80%;
+}
+#account-delete h1 {
+    margin-left: 18px;
+}
+#account-delete p {
+    margin-left: 18px;
 }
 
-.header-buttons:active {
-    background-color: rgb(0, 76, 121);
+footer {
+    display: flex;
+    justify-content: center;
 }
