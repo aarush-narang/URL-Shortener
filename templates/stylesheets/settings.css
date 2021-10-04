@@ -11,10 +11,9 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    margin-top: 140px;
 
-    margin-top: 50px;
-
-    height: 70vh;
+    height: 60vh;
     min-height: 500px;
     min-width: 550px;
 }
@@ -122,7 +121,6 @@ body {
 
     transition: background-color 200ms ease;
 }
-
 #settings-save:hover {
     background-color: rgb(16, 47, 65);
 }
@@ -136,21 +134,60 @@ body {
     border-radius: 14px;
 
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 
     font-family: Urbanist;
     color: lightblue;
     font-size: 80%;
 }
+#delete-warning {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+}
 #account-delete h1 {
     margin-left: 18px;
 }
 #account-delete p {
+    font-size: 110%;
     margin-left: 18px;
+    margin-top: 4px;
 }
+#delete-btn-container {
+    margin-right: 18px;
+}
+#delete-btn {
+    border: none;
+    outline: none;
+    cursor: pointer;
 
+    width: 24vw;
+    max-width: 500px;
+    min-width: 100px;
+
+    height: 10vh;
+    min-height: 60px;
+    max-height: 120px;
+
+    padding: 13px;
+    border-radius: 5px;
+
+    background-color: rgb(16, 47, 65);
+    color: rgb(255, 47, 0);
+    font-family: Urbanist;
+    font-size: 140%;
+
+    transition: background-color 200ms ease;
+}
+#delete-btn:hover {
+    background-color: rgb(18, 49, 67);
+}
+#delete-btn:active {
+    background-color: rgb(16, 43, 60);
+}
 footer {
     display: flex;
     justify-content: center;
