@@ -129,8 +129,8 @@ body {
 }
 /* account deletion button */
 #account-delete {
-    background-color: rgb(13, 35, 48);
-    border: 1px solid rgb(40, 122, 151);
+    background-color: rgba(97, 34, 34, 0.4);
+    border: 1px solid rgb(174, 33, 33);
     border-radius: 14px;
 
     display: flex;
@@ -150,11 +150,13 @@ body {
 }
 #account-delete h1 {
     margin-left: 18px;
+    color: rgb(232, 62, 62);
 }
 #account-delete p {
     font-size: 110%;
     margin-left: 18px;
     margin-top: 4px;
+    color: rgb(232, 62, 62);
 }
 #delete-btn-container {
     margin-right: 18px;
@@ -175,18 +177,20 @@ body {
     padding: 13px;
     border-radius: 5px;
 
-    background-color: rgb(16, 47, 65);
-    color: rgb(255, 47, 0);
+    background-color: rgba(158, 57, 50, 0.5);
+    color: rgb(255, 47, 47);
     font-family: Urbanist;
     font-size: 140%;
 
-    transition: background-color 200ms ease;
+    transition: 200ms ease;
 }
 #delete-btn:hover {
-    background-color: rgb(18, 49, 67);
+    background-color: rgba(255, 17, 0, 0.4);
+    color: rgb(255, 138, 138)
 }
 #delete-btn:active {
-    background-color: rgb(16, 43, 60);
+    background-color: rgb(165, 63, 63);
+    color: rgb(90, 34, 34);
 }
 footer {
     display: flex;
