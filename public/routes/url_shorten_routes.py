@@ -144,9 +144,9 @@ def url_shorten():
     
 
     # check if domain/link is banned
-    with open('banned.json', 'r') as f:
+    with open('./banned.json', 'r') as f:
         banned = json.load(f)
-    
+        
     for domain in banned['domains']:
         if domain in link:
             return jsonify(error=True, msg='That domain is banned.')

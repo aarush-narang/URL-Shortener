@@ -57,6 +57,8 @@ window.addEventListener("load", function () {
                     return warn(resp.msg)
                 } else if(resp.type === 'LIMIT_REACHED') {
                     warn(resp.msg)
+                } else {
+                    return warn(resp.msg)
                 }
                 
             }

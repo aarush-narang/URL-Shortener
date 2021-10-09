@@ -38,7 +38,7 @@ def return_image(img_name):
     return abort(404)
 
 
-@main_router.get('/templates/stylesheets/<stylesheet>')
+@main_router.get('/stylesheets/<stylesheet>')
 def return_stylesheet(stylesheet):
     stylesheet_dir_path = os.path.dirname(f'{PROJ_PATH}\\templates\\stylesheets')
 
