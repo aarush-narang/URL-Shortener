@@ -1,3 +1,5 @@
+import shajs from 'https://cdn.skypack.dev/sha.js'
+
 window.addEventListener("load", function () {
     const sign_in_form = document.getElementById('sign-in-form')
     const token = document.getElementsByName('csrf_token') // CSRF Token for authorization
@@ -19,14 +21,14 @@ window.addEventListener("load", function () {
     }
 
     function sendData() {
-        const encrypted_pass = window.shajs('sha512').update(password.value).digest('hex')
+        const encrypted_pass = shajs('sha512').update(password.value).digest('hex')
         const signinXHR = new XMLHttpRequest()
         signinXHR.addEventListener('load', (event) => {
-            resp = JSON.parse(event.target.response)
+            const resp = JSON.parse(event.target.response)
             if(resp.msg === 'INVALID_EMAIL' || resp.msg === 'INVALID_PASSWORD') {
                 sign_in_form.reset()
-                old_email = email.value
-                old_password = password.value
+                const old_email = email.value
+                const old_password = password.value
                 email.style.border = password.style.border = '1px solid red'
                 email_warning.style.display = pass_warning.style.display = 'block'
                 email_warning.innerHTML = pass_warning.innerHTML = 'Your email or password is incorrect.'
@@ -57,7 +59,7 @@ window.addEventListener("load", function () {
         const email_regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
         if(!email_regex.test(email.value)) { // checks for valid email
-            old_email = email.value
+            const old_email = email.value
             email.style.border = '1px solid red'
             email_warning.style.display = 'block'
             email_warning.innerHTML = 'Please enter a valid email.'
@@ -70,7 +72,7 @@ window.addEventListener("load", function () {
                 }
             }, 100);
         } else if(password.value === ''){ // check if there is something in the password input
-            old_pass = password.value
+            const old_pass = password.value
             password.style.border = '1px solid red'
             pass_warning.style.display = 'block'
             pass_warning.innerHTML = 'Please enter a password.'

@@ -1,3 +1,5 @@
+import shajs from 'https://cdn.skypack.dev/sha.js'
+
 window.addEventListener("load", function () {
     function startPasswordCheck(input_type) {
         const pass_total_msg = document.getElementById('msg-total')
@@ -88,13 +90,13 @@ window.addEventListener("load", function () {
     
     // send the request to create the account
     function sendData() {
-        const encrypted_pass = window.shajs('sha512').update(password.value).digest('hex')
+        const encrypted_pass = shajs('sha512').update(password.value).digest('hex')
         const signupXHR = new XMLHttpRequest()
         signupXHR.addEventListener('load', (event) => {
             const resp = JSON.parse(event.target.response)
             if(resp.msg === 'EXISTING_EMAIL') {
                 sign_up_form.reset()
-                old_email = email.value
+                const old_email = email.value
                 email.style.border = '1px solid red'
                 email_warning.style.display = 'block'
                 email_warning.innerHTML = 'An account with this email already exists.'
@@ -108,7 +110,7 @@ window.addEventListener("load", function () {
                 }, 100);
             } else if(resp.msg === 'EXISTING_USERNAME') {
                 sign_up_form.reset()
-                old_username = username.value
+                const old_username = username.value
                 username.style.border = '1px solid red'
                 username_warning.style.display = 'block'
                 username_warning.innerHTML = 'An account with this username already exists.'
@@ -122,7 +124,7 @@ window.addEventListener("load", function () {
                 }, 100);
             } else if(resp.msg === 'INVALID_EMAIL') {
                 sign_up_form.reset()
-                old_email = email.value
+                const old_email = email.value
                 email.style.border = '1px solid red'
                 email_warning.style.display = 'block'
                 email_warning.innerHTML = 'Please enter a valid email..'
@@ -136,7 +138,7 @@ window.addEventListener("load", function () {
                 }, 100);
             } else if(resp.msg === 'INVALID_USERNAME') {
                 sign_up_form.reset()
-                old_username = username.value
+                const old_username = username.value
                 username.style.border = '1px solid red'
                 username_warning.style.display = 'block'
                 username_warning.innerHTML = 'Please enter a valid username.'
@@ -180,7 +182,7 @@ window.addEventListener("load", function () {
         const username_regex = /^[a-zA-Z0-9]{1,20}$/
 
         if(!username_regex.test(username.value)) {
-            old_username = username.value
+            const old_username = username.value
             username.style.border = '1px solid red'
             username_warning.style.display = 'block'
             username_warning.innerHTML = 'Please enter a valid username.'
@@ -194,7 +196,7 @@ window.addEventListener("load", function () {
             }, 100);
         }
         else if(!email.value.match(email_regex)) { // checks for valid email
-            old_email = email.value
+            const old_email = email.value
             email.style.border = '1px solid red'
             email_warning.style.display = 'block'
             email_warning.innerHTML = 'Please enter a valid email.'
@@ -207,7 +209,7 @@ window.addEventListener("load", function () {
                 }
             }, 100);
         } else if(!password_regex.test(password.value) || password.value.includes(' ')) { //check for valid password
-            old_password = password.value
+            const old_password = password.value
             password.style.border = '1px solid red'
             pass_warning.style.display = 'block'
             pass_warning.innerHTML = 'Please enter a valid password.'
@@ -220,7 +222,7 @@ window.addEventListener("load", function () {
                 }
             }, 100);
         } else if(verif_pass.value !== password.value){ // check if passwords match
-            old_password = verif_pass.value
+            const old_password = verif_pass.value
             verif_pass.style.border = '1px solid red'
             verif_pass_warning.style.display = 'block'
             verif_pass_warning.innerHTML = 'Your passwords don\'t match.'
