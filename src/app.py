@@ -18,4 +18,4 @@ def pagenotfound(e):
     return render_template('404.html')
 
 if __name__ == '__main__':
-    app.run(host=os.getenv('DOMAIN'), port=os.getenv('PORT'), ssl_context=('../cert.pem', '../key.pem'), debug=True) # certificates for https
+    app.run(host=os.getenv('DOMAIN'), port=os.getenv('PORT'), ssl_context='adhoc', debug=True) # certificates for https
