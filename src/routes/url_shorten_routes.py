@@ -7,7 +7,6 @@ import hashlib, random
 import re
 import threading, time, datetime
 
-from flask.helpers import make_response
 from routes import client 
 
 url_db = client.url_shortener  # url_shortener is collection name, contains the short link and main link, also contains user signin information (userid, username, password)

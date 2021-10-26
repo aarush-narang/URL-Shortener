@@ -2,7 +2,7 @@ __name__ = 'accounts' # have to change the name for some reason otherwise it won
 
 import os
 import re
-from flask import Blueprint, render_template, redirect, request, jsonify, session, make_response
+from flask import Blueprint, render_template, redirect, request, jsonify, session, abort
 import pymongo
 import json
 from routes import client 
@@ -92,21 +92,29 @@ def sign_up():
 
 @account_router.get('/settings') # change to .route instead of .get and add methods for get and post, use this route for updating settings
 def settings():
+    if len(session) <= 1: # if they are not signed in, dont show the page
+            return render_template('404.html')
     return render_template('settings.html', user=session['user']['username'])
 
     
 @account_router.get('/mylinks')
 def myLinks():
+    if len(session) <= 1: # if they are not signed in, dont show the page
+            return render_template('404.html')
     return render_template('mylinks.html', user=session['user']['username'], domain=os.getenv('DOMAIN'), port=os.getenv('PORT'))
 
 @account_router.get('/getlinks')
 def getLinks():
+    if len(session) <= 1: # if they are not signed in, dont allow them to make requests
+        return abort(401)
     user = url_db.user_urls.find_one({ 'user_id': session['user']['user_id'] })
     user_urls = dict(user)['links']
     return jsonify(links=user_urls)
 
 @account_router.delete('/deletelink')
 def deletelink():
+    if len(session) <= 1: # if they are not signed in, dont show the page
+        return abort(401)
     data = json.loads(request.data.decode())
     user = url_db.user_urls.find_one({ 'user_id': session['user']['user_id'] })
     user_links = dict(user)['links']

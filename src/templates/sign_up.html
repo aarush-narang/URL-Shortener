@@ -3,9 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="stylesheets/sign_up.css">
-    <link rel="stylesheet" type="text/css" href="stylesheets/header.css">
-    <script type="module" src="static/sign_up.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/sign_up.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/header.css') }}">
+    <script type="module" src="{{ url_for('static', filename='sign_up.js') }}"></script>
     <title>Sign Up</title>
 </head>
 

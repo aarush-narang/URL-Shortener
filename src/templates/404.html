@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="stylesheets/404.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/404.css') }}">
     <script>
         const home_redirect = () => window.location = '/home'
     </script>
@@ -13,7 +13,7 @@
 <body>
     <div>
         <div id='container'>
-            <img id='image-404' src="../../public/404-page.png">
+            <img id='image-404' src="{{ url_for('static', filename='images/404-page.png') }}">
             <div id='msg-container'>
                 <h1 id='msg-404'>
                     404 PAGE NOT FOUND

@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
 from routes import account_routes, main_routes, url_shorten_routes
 import os
 from flask_wtf import CSRFProtect
