@@ -41,7 +41,7 @@ window.addEventListener("load", function () {
                     }
                 }, 100);
             } else if(resp.msg === 'LOGGED_IN') {
-                return window.location = '/home'
+                return window.location = '/'
             }
         })
         signinXHR.addEventListener('error', (event) => {

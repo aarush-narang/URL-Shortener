@@ -1,6 +1,6 @@
 __name__ = 'main' # have to change the name for some reason otherwise it wont import
 
-from flask import Blueprint, render_template, redirect, session
+from flask import Blueprint, render_template, session
 import os
 from routes import client
 
@@ -9,11 +9,6 @@ url_db = client.url_shortener  # url_shortener is collection name, contains the 
 main_router = Blueprint(__name__, 'routes')
 
 @main_router.route('/')
-def home_redirect():
-    return redirect('/home')
-
-
-@main_router.route('/home')
 def home():
     if len(session) > 1: # check if there is a user id in their session
         try:

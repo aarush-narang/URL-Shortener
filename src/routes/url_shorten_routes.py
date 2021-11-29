@@ -61,7 +61,7 @@ def short_link(link, char_length=7):
     chars = ''.join(chars)
 
     # generate the link
-    hash_object = hashlib.sha512(link.encode())
+    hash_object = hashlib.sha256(link.encode())
     hash_hex = hash_object.hexdigest()
     new_link = hash_hex[0:char_length] + chars
 

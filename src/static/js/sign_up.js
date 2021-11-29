@@ -153,7 +153,7 @@ window.addEventListener("load", function () {
             } else if(resp.msg === 'SIGNED_UP') {
                 const signinXHR = new XMLHttpRequest()
                 signinXHR.addEventListener('load', (event) => {
-                    return window.location = '/home'
+                    return window.location = '/'
                 })
                 signinXHR.addEventListener('error', (event) => {
                     console.log('error')

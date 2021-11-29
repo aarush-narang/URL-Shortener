@@ -46,7 +46,7 @@ def sign_in():
 def logout():
     if len(session) > 1: # check if they are signed in
         del session['user']
-    return redirect('/home')
+    return redirect('/')
 
 @account_router.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
