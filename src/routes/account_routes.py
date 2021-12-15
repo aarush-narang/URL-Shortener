@@ -6,6 +6,7 @@ from flask import Blueprint, render_template, redirect, request, jsonify, sessio
 import pymongo
 import json
 from routes import client 
+import hashlib, random
 
 url_db = client.url_shortener  # url_shortener is collection name, contains the short link and main link, also contains user signin information (userid, username, password)
 last_user_id = {'user_id': '1000000000', 'run?': False} # store the last user id and if the function below was run in cache
@@ -16,8 +17,20 @@ def getLastDBUserId(): # store the last user_id from the db in memory and every 
     for x in last_user:
         last_user_id['user_id'] = x['user_id']
 
-account_router = Blueprint(__name__, 'routes')
+def generateSalt():
+    # shuffle all chars that can be used
+    chars = 'abcdefghijklmnopqrstuvqxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-=_+[]\\{}|;\':",./<>?'
+    chars = list(chars)
+    random.shuffle(chars)
+    chars = ''.join(chars)
 
+    # take random section of the long string of chars
+    lower_bound_max = len(chars) - 8
+    bound = random.randint(0, lower_bound_max)
+    
+    return chars[bound:bound+7]
+
+account_router = Blueprint(__name__, 'routes')
 
 @account_router.route('/sign_in', methods=['GET', 'POST'])
 def sign_in():
@@ -29,11 +42,14 @@ def sign_in():
         data = request.data.decode()
         data = json.loads(data)
         email = data['email']
-        encrypted_password = data['password']
-
+        password = str(data['password'])
+        pepper = str(os.getenv('PEPPER'))
+        print(password)
         email_check = url_db.users.find({ 'email': email }) # check if email exists
-        for user in email_check: 
-            if user['password'] == encrypted_password: # check if password matches email (if it exists)
+        for user in email_check:
+            salt = str(user['salt'])
+            print(password, salt, pepper)
+            if user['password'] == hashlib.sha256((password+salt+pepper).encode()).hexdigest(): # check if password matches email (if it exists)
                 session['user'] = { 'user_id': user['user_id'], 'username': user['username'], 'email': user['email'] } # add user id to their session
                 return jsonify(msg='LOGGED_IN')
             else:
@@ -72,7 +88,7 @@ def sign_up():
         if not re.match(email_regex, email):
             return jsonify(msg='INVALID_EMAIL')
 
-        # if both pass the regex, check if the username or email already exist
+        # if both pass the regex, check if the username or email already exists
         username_check = url_db.users.find({ 'username': username }) # check if email exists
         for user in username_check:
             return jsonify(msg='EXISTING_USERNAME')
@@ -81,8 +97,14 @@ def sign_up():
             return jsonify(msg='EXISTING_EMAIL')
         password = data['password']
         last_user_id['user_id'] = str(int(last_user_id['user_id'])+1) # add on to the previous user id
+        # get salt and pepper
+        salt = generateSalt()
+        pepper = str(os.getenv('PEPPER'))
+        password = str(password)
+        password = hashlib.sha256((password+salt+pepper).encode()).hexdigest() # hash password with salt and pepper
+
         url_db.users.insert_one(
-            { 'user_id': last_user_id['user_id'], 'username': username, 'email': email, 'password': password }
+            { 'user_id': last_user_id['user_id'], 'username': username, 'email': email, 'password': password, 'salt': salt }
         )
         url_db.user_urls.insert_one(
             { 'user_id': last_user_id['user_id'], 'links': [] }

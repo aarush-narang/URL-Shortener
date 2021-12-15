@@ -21,7 +21,7 @@ window.addEventListener("load", function () {
     }
 
     function sendData() {
-        const encrypted_pass = shajs('sha512').update(password.value).digest('hex')
+        const pwd = password.value
         const signinXHR = new XMLHttpRequest()
         signinXHR.addEventListener('load', (event) => {
             const resp = JSON.parse(event.target.response)
@@ -52,7 +52,7 @@ window.addEventListener("load", function () {
 
         signinXHR.open('POST', '/sign_in') // open the request
         signinXHR.setRequestHeader('X-CSRFToken', token[0].getAttribute('value')) // add header for csrf token
-        signinXHR.send(JSON.stringify({ "email": email.value, "password": encrypted_pass }))
+        signinXHR.send(JSON.stringify({ "email": email.value, "password": pwd }))
     }
     sign_in_form.addEventListener('submit', function (event) {
         event.preventDefault()
