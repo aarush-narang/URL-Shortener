@@ -1,6 +1,6 @@
 # URL Shortener
 
-Created using Flask and VanillaJS, this clone includes not only english words but has the option to switch to spanish words and food-related words
+Created using Flask and VanillaJS, this is a URL shortener in which you can also create an account to save your shortened URLs.
 
 ## Installation
 
