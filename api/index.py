@@ -17,7 +17,6 @@ client = pymongo.MongoClient(MONGO_DB_URI, tlsCAFile=certifi.where())  # you cou
 url_db = client.url_shortener  # url_shortener is collection name, contains the short link and main link, also contains user signin information (userid, username, password)
 last_user_id = {'user_id': '1000000000', 'run?': False} # store the last user id and if the function below was run in cache
 requests = {}  # record all ip addresses and # of requests from each and the time they got ratelimted (to see how much longer their ratelimit will last)
-DOMAIN = f'https://{os.getenv("DOMAIN")}:{os.getenv("PORT")}/'
 
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
@@ -40,10 +39,10 @@ def home():
             db_user = url_db.users.find({ 'user_id': session['user']['user_id'] })[0]['username'] # if it matches, find the user and get the email
         except IndexError:
             del session['user']
-            return render_template('home.html', domain=os.getenv('DOMAIN'), port=os.getenv('PORT')) # if it is unable to find in the db, delete the session (log out) and make them sign in again
-        return render_template('home.html', domain=os.getenv('DOMAIN'), port=os.getenv('PORT'), user=db_user) # pass in the email when rendering template
+            return render_template('home.html') # if it is unable to find in the db, delete the session (log out) and make them sign in again
+        return render_template('home.html', user=db_user) # pass in the email when rendering template
     else:
-        return render_template('home.html', domain=os.getenv('DOMAIN'), port=os.getenv('PORT'))
+        return render_template('home.html')
 
 
 # Account Routes and Functions
@@ -154,7 +153,7 @@ def settings():
 def myLinks():
     if len(session) <= 1: # if they are not signed in, dont show the page
             return render_template('404.html')
-    return render_template('mylinks.html', user=session['user']['username'], domain=os.getenv('DOMAIN'), port=os.getenv('PORT'))
+    return render_template('mylinks.html', user=session['user']['username'])
 
 @app.get('/getlinks')
 def getLinks():
@@ -373,5 +372,5 @@ def url_shorten():
     return jsonify(short_link=short_url)
 
 
-# if __name__ == '__main__':
-#     app.run(host=os.getenv('DOMAIN'), port=os.getenv('PORT'), debug=True) # certificates for https
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port="3000", debug=True) # certificates for https

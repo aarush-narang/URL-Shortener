@@ -1,5 +1,3 @@
-const script = document.currentScript
-
 function copy_short_link() {
     const copyText = document.querySelector("#link");
     copyText.select();
@@ -7,7 +5,7 @@ function copy_short_link() {
 }
 
 window.addEventListener("load", function () {
-    const domain = `https://${script.getAttribute('domain')}:${script.getAttribute('port')}/`
+    const domain = window.location.href
     const form = document.getElementById("link-form")
     const input = document.getElementById("link")
     const link_submit_button = document.getElementById('link-submit')

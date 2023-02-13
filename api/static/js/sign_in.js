@@ -1,5 +1,3 @@
-import shajs from 'https://cdn.skypack.dev/sha.js'
-
 window.addEventListener("load", function () {
     const sign_in_form = document.getElementById('sign-in-form')
     const token = document.getElementsByName('csrf_token') // CSRF Token for authorization

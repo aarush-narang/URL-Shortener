@@ -10,8 +10,6 @@ window.addEventListener('load', function () {
             linkscontainer.appendChild(no_links_text)
             return
         }
-        const domain = script.getAttribute('domain')
-        const port = script.getAttribute('port')
 
         const linkscontainer = document.getElementById('container')
         const linkTemplate = document.querySelector('template')
@@ -25,7 +23,7 @@ window.addEventListener('load', function () {
         links[0].onclick = () => window.open(link)
         
         
-        links[1].innerHTML = `https://${domain}:${port}/${shortlink}` // set values for short link
+        links[1].innerHTML = `${window.location.href}/${shortlink}` // set values for short link
         links[1].onclick = () => window.open(shortlink)
 
         buttons[0].onclick = () => { // copy link button
@@ -65,7 +63,7 @@ window.addEventListener('load', function () {
             }, 3000);
         }
 
-        buttons[1].title = `Delete https://${domain}:${port}/${shortlink}`; // delete link button
+        buttons[1].title = `Delete ${window.location.href}/${shortlink}`; // delete link button
         buttons[1].onclick = () => { // delete link button
             deletelink(link, shortlink)
         }
