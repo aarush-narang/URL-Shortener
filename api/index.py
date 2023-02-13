@@ -373,5 +373,5 @@ def url_shorten():
     return jsonify(short_link=short_url)
 
 
-if __name__ == '__main__':
-    app.run(host=os.getenv('DOMAIN'), port=os.getenv('PORT'), debug=True) # certificates for https
+# if __name__ == '__main__':
+#     app.run(host=os.getenv('DOMAIN'), port=os.getenv('PORT'), debug=True) # certificates for https
