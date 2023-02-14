@@ -98,6 +98,11 @@ window.addEventListener("load", function () {
             XHR.setRequestHeader('X-CSRFToken', token[0].getAttribute('value'))
             XHR.send(JSON.stringify({ "link": input.value, 'ip': IP }));
         })
+        IP_XHR.addEventListener('error', function (event) {
+            XHR.open("POST", "/url_shorten");
+            XHR.setRequestHeader('X-CSRFToken', token[0].getAttribute('value'))
+            XHR.send(JSON.stringify({ "link": input.value, 'ip': '0.0.0.0' }));
+        })
         IP_XHR.open('GET', 'https://api.ipify.org?format=json');
         IP_XHR.send();
     }
