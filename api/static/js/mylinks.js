@@ -1,5 +1,3 @@
-const script = document.currentScript
-
 window.addEventListener('load', function () {
     function createLinkElement(link, shortlink) {
         if(link === 'NO_LINKS') {
