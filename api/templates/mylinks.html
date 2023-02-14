@@ -2,10 +2,20 @@
 <html lang="en">
 
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2MLGK6XSHV"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-2MLGK6XSHV');
+    </script>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/mylinks.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/header.css') }}">
-    <script type="text/javascript" src="{{ url_for('static', filename='js/mylinks.js') }}" domain={{domain}} port={{port}}></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/mylinks.js') }}" domain={{domain}}
+        port={{port}}></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/header.js') }}" user={{user}}></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>{{user}}'s Links</title>
@@ -44,7 +54,7 @@
             <p id='total-links'></p>
         </div>
         <div id='container'>
-           
+
         </div>
     </div>
 </body>

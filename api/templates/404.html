@@ -2,6 +2,15 @@
 <html lang="en">
 
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2MLGK6XSHV"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-2MLGK6XSHV');
+    </script>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/404.css') }}">
     <script>
@@ -18,7 +27,8 @@
                 <h1 id='msg-404'>
                     404 PAGE NOT FOUND
                 </h1>
-                <p id='text-404'>Uh oh, the link you entered was not found. This means you clicked on a bad link or entered an invalid url</p>
+                <p id='text-404'>Uh oh, the link you entered was not found. This means you clicked on a bad link or
+                    entered an invalid url</p>
             </div>
             <div>
                 <button id='back-to-home-btn' onclick=home_redirect()>Click Here to return home</button>
@@ -26,7 +36,7 @@
         </div>
 
     </div>
-    
+
 </body>
 
 </html>

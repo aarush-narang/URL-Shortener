@@ -2,6 +2,15 @@
 <html lang="en">
 
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2MLGK6XSHV"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-2MLGK6XSHV');
+    </script>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/home.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/header.css') }}">
@@ -18,7 +27,8 @@
             <button id='dropdown-button' class='header-buttons' data-dropdown-button>{{user}}</button>
             <div id='dropdown'>
                 <a href="/mylinks">My Links</a>
-                <a href="/settings">Settings</a>
+                <a href="/settings"
+                    style="pointer-events: none; background-color: rgb(25, 88, 126); cursor: not-allowed;">Settings</a>
                 <a style="color: rgb(166, 70, 70);" href="/logout">Log Out</a>
             </div>
         </div>
