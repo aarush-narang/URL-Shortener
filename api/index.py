@@ -371,7 +371,8 @@ def url_shorten():
             if len(user_urls) == 200:
                 return 'LIMIT_REACHED'
             if len(user_urls) == 0:
-                user_urls.append({'link': long_link, 'shortlink': shortlink})
+                user_urls.append({'link': long_link, 'shortlink': shortlink,
+                                 'created': datetime.datetime.now().isoformat()})
                 url_db.user_urls.update_one({'user_id': session['user']['user_id']}, {
                                             '$set': {'links': user_urls}})
             isInDb = False
@@ -380,7 +381,8 @@ def url_shorten():
                     isInDb = True
                     break
             if not isInDb:
-                user_urls.append({'link': long_link, 'shortlink': shortlink})
+                user_urls.append({'link': long_link, 'shortlink': shortlink,
+                                 'created': datetime.datetime.now().isoformat()})
                 url_db.user_urls.update_one({'user_id': session['user']['user_id']}, {
                                             '$set': {'links': user_urls}})
 
@@ -417,7 +419,8 @@ def url_shorten():
                 break
 
     url_db.urls.insert_one(
-        {'link': link, 'short_link': short_url}
+        {'link': link, 'short_link': short_url,
+            'created': datetime.datetime.now().isoformat()}
     )
     res = insertLinkToUserDB(link, short_url)
     if res == 'LIMIT_REACHED':
@@ -425,5 +428,5 @@ def url_shorten():
     return jsonify(short_link=short_url)
 
 
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port="3000", debug=True)  # certificates for https
+# if __name__ == '__main__':
+#     app.run(host="0.0.0.0", port="3000", debug=True) # certificates for https
