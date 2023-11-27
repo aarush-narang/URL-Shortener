@@ -159,7 +159,7 @@ def sign_up():
 
         url_db.users.insert_one(
             {'user_id': last_user_id['user_id'], 'username': username,
-                'email': email, 'password': password, 'salt': salt}
+                'email': email, 'password': password, 'salt': salt, 'created': datetime.datetime.now().isoformat()}
         )
         url_db.user_urls.insert_one(
             {'user_id': last_user_id['user_id'], 'links': []}
