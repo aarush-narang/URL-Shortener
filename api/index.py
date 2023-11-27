@@ -322,7 +322,7 @@ def url_shorten():
             if len(user_urls) == 200:
                 return 'LIMIT_REACHED'
             if len(user_urls) == 0:
-                user_urls.append({ 'link': long_link, 'shortlink': shortlink, 'created': datetime.datetime.now().isoformat() })
+                user_urls.append({ 'link': long_link, 'shortlink': shortlink })
                 url_db.user_urls.update_one({ 'user_id': session['user']['user_id'] }, { '$set': { 'links': user_urls }  })
             isInDb = False
             for obj in user_urls:
@@ -330,7 +330,7 @@ def url_shorten():
                     isInDb = True
                     break
             if not isInDb:
-                user_urls.append({ 'link': long_link, 'shortlink': shortlink, 'created': datetime.datetime.now().isoformat() })
+                user_urls.append({ 'link': long_link, 'shortlink': shortlink })
                 url_db.user_urls.update_one({ 'user_id': session['user']['user_id'] }, { '$set': { 'links': user_urls }  })
 
     # check if link is already in db
@@ -364,7 +364,7 @@ def url_shorten():
                 break
 
     url_db.urls.insert_one(
-        { 'link': link, 'short_link': short_url, 'created': datetime.datetime.now().isoformat() }
+        { 'link': link, 'short_link': short_url }
     )
     res = insertLinkToUserDB(link, short_url)
     if res == 'LIMIT_REACHED':
